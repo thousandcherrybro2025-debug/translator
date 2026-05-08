@@ -296,7 +296,7 @@ box-shadow:0 6px 28px rgba(26,26,46,.22);}
 ```
   <div class="vin-wrap">
     <textarea class="vin" id="vin" rows="3"
-      placeholder="ここをタップして入力 / キーボード🎤で音声入力"
+      placeholder="ここをタップして入力。キーボードの🎤で音声入力"
       inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false"
       oninput="onVinInput()" onkeydown="onVinKey(event)"></textarea>
     <button class="vin-clear" onclick="clearVin()">✕</button>
@@ -405,7 +405,8 @@ function detectEnv(){
   }
 
   // Claude.ai内プレビュー検出（location.originがclaude.aiの場合）
-  if(window.location.hostname.includes('claude.ai')||window.location.protocol==='blob:'){
+  // GitHub Pages等のhttps環境では警告不要
+  if(window.location.protocol!=='https:'&&(window.location.hostname.includes('claude.ai')||window.location.protocol==='blob:')){
     document.getElementById('cors-warn').style.display='block';
   }
 }
@@ -555,13 +556,14 @@ async function doTranslate(){
   if(!text){ setStatus('⚠️ テキストを入力してください','err'); return; }
   if(phase!=='idle') return;
 
-  // Claude.ai内では翻訳API接続不可 → 事前チェック
+  // Claude.ai内プレビューのみブロック（GitHub Pages等のhttpsは許可）
   const host=window.location.hostname;
-  const isInsideClaude=host.includes('claude.ai')||window.location.protocol==='blob:';
-  if(isInsideClaude){
+  const isPreviewBlob=window.location.protocol==='blob:';
+  const isClaudeDotAi=host==='claude.ai'||host.endsWith('.claude.ai');
+  if(isPreviewBlob||isClaudeDotAi){
     setStep('idle');
     document.getElementById('cors-warn').style.display='block';
-    setStatus('⚠️ Claude.ai内では翻訳できません。ファイルをSafariで直接開いてください','err');
+    setStatus('⚠️ Claude.ai内では翻訳できません。GitHub PagesのURLで開いてください','err');
     return;
   }
 
