@@ -271,12 +271,12 @@ box-shadow:0 6px 28px rgba(26,26,46,.22);}
     テキストボックスをタップ → キーボード右下の <b>🎤</b> を押して話す → 「翻訳する」ボタンを押す
   </div>
 
-  <!-- CORS警告（file://またはhttp://で開いた場合） -->
+  <!-- CORS警告（blob:プロトコルのみ表示） -->
 
-  <div class="cors-warn" id="cors-warn">
+  <div class="cors-warn" id="cors-warn" style="display:none">
     <b>⚠️ 翻訳APIに接続するには</b>
-    このHTMLファイルをダウンロードして <b>Safari / Chrome で直接開いて</b> ください。<br>
-    Claude.ai内のプレビューからは外部APIに接続できません。
+    このアプリを <b>GitHub Pages の URL</b> で開いてください。<br>
+    Claude.ai内のプレビューからは翻訳APIに接続できません。
   </div>
 
   <div class="mic-zone">
@@ -404,11 +404,7 @@ function detectEnv(){
     document.getElementById('ios-hint').style.display='block';
   }
 
-  // Claude.ai内プレビュー検出（location.originがclaude.aiの場合）
-  // GitHub Pages等のhttps環境では警告不要
-  if(window.location.protocol!=='https:'&&(window.location.hostname.includes('claude.ai')||window.location.protocol==='blob:')){
-    document.getElementById('cors-warn').style.display='block';
-  }
+  // GitHub Pages (https) では警告不要 - 何もしない
 }
 
 // ════════════════════════
@@ -556,14 +552,11 @@ async function doTranslate(){
   if(!text){ setStatus('⚠️ テキストを入力してください','err'); return; }
   if(phase!=='idle') return;
 
-  // Claude.ai内プレビューのみブロック（GitHub Pages等のhttpsは許可）
-  const host=window.location.hostname;
-  const isPreviewBlob=window.location.protocol==='blob:';
-  const isClaudeDotAi=host==='claude.ai'||host.endsWith('.claude.ai');
-  if(isPreviewBlob||isClaudeDotAi){
+  // blob: プロトコル（Claude.aiプレビュー）のみブロック
+  if(window.location.protocol==='blob:'){
     setStep('idle');
     document.getElementById('cors-warn').style.display='block';
-    setStatus('⚠️ Claude.ai内では翻訳できません。GitHub PagesのURLで開いてください','err');
+    setStatus('⚠️ GitHub PagesのURLで開いてください','err');
     return;
   }
 
@@ -625,7 +618,7 @@ For Filipino: use standard Tagalog widely understood across the Philippines.`,
     } else if(e.message==='RATE'){
       setStatus('⚠️ リクエスト制限中。数秒待ってから再試行してください','err');
     } else if(e.message==='NETWORK'){
-      setStatus('⚠️ このHTMLをダウンロードして、Safariで直接開いてください','err');
+      setStatus('⚠️ ネットワークエラー。通信状況を確認してください','err');
     } else if(e.message==='EMPTY'){
       setStatus('⚠️ 翻訳結果が空でした。もう一度試してください','err');
     } else {
