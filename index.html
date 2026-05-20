@@ -269,6 +269,82 @@ textarea.vin.fil:focus{border-color:var(--fil);}
   </div>
 </div>
 
+<!-- 大きな読み上げボタン -->
+<div id="speak-zone" style="display:none;width:calc(100% - 32px);max-width:468px;margin-bottom:12px;">
+  <button id="big-speak-btn" onclick="bigSpeak()" style="
+    width:100%;padding:20px;border-radius:18px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,#c0392b,#e74c3c);
+    color:#fff;font-size:18px;font-weight:900;font-family:inherit;
+    box-shadow:0 6px 24px rgba(192,57,43,0.4);
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    transition:all .2s;letter-spacing:.02em;
+    animation:speakPop .35s cubic-bezier(.68,-.55,.27,1.55);
+  ">
+    <span id="big-speak-icon" style="font-size:28px">🔊</span>
+    <span id="big-speak-label">タガログ語で読み上げる</span>
+  </button>
+  <!-- 音声波形アニメ（再生中） -->
+  <div id="speak-wave" style="display:none;justify-content:center;align-items:flex-end;
+    gap:5px;height:32px;margin-top:10px;">
+    <div class="sw"></div><div class="sw"></div><div class="sw"></div>
+    <div class="sw"></div><div class="sw"></div><div class="sw"></div><div class="sw"></div>
+  </div>
+  <!-- 音声設定（折りたたみ） -->
+  <div style="margin-top:8px;text-align:center;">
+    <button onclick="toggleSpeakSettings()" style="
+      background:none;border:none;font-size:12px;color:#999;cursor:pointer;
+      font-family:inherit;padding:4px 8px;
+    " id="speak-settings-toggle">⚙️ 音声設定</button>
+  </div>
+  <div id="speak-settings" style="display:none;background:#fff;border-radius:14px;
+    padding:14px;margin-top:6px;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+    <div style="font-size:12px;font-weight:700;color:#666;margin-bottom:10px;">🎙️ 読み上げ設定</div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;color:#999;margin-bottom:4px;">音声: <span id="voice-name-display" style="color:#1a1a2e;font-weight:700">自動選択中...</span></div>
+      <select id="voice-select2" onchange="onVoiceChange2()" style="
+        width:100%;padding:8px 10px;border-radius:10px;
+        border:1.5px solid #ddd8d0;font-size:13px;
+        font-family:inherit;background:#fafafa;color:#1a1a2e;">
+        <option value="">自動選択（推奨）</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:11px;color:#999;margin-bottom:2px;">速さ: <span id="rate-val2">0.82</span></div>
+        <input type="range" id="rate-slider2" min="0.5" max="1.5" step="0.05" value="0.82"
+          oninput="document.getElementById('rate-val2').textContent=parseFloat(this.value).toFixed(2)"
+          style="width:100%">
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:11px;color:#999;margin-bottom:2px;">ピッチ: <span id="pitch-val2">1.05</span></div>
+        <input type="range" id="pitch-slider2" min="0.5" max="2.0" step="0.05" value="1.05"
+          oninput="document.getElementById('pitch-val2').textContent=parseFloat(this.value).toFixed(2)"
+          style="width:100%">
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes speakPop{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+#big-speak-btn:active{transform:scale(.97);}
+#big-speak-btn.speaking{
+  background:linear-gradient(135deg,#219150,#27ae60);
+  box-shadow:0 6px 24px rgba(33,145,80,0.4);
+  animation:none;
+}
+.sw{width:5px;border-radius:4px;background:#e74c3c;
+  animation:swAnim 1.1s infinite ease-in-out;}
+.sw:nth-child(1){animation-delay:.0s}
+.sw:nth-child(2){animation-delay:.15s}
+.sw:nth-child(3){animation-delay:.3s}
+.sw:nth-child(4){animation-delay:.45s}
+.sw:nth-child(5){animation-delay:.6s}
+.sw:nth-child(6){animation-delay:.75s}
+.sw:nth-child(7){animation-delay:.9s}
+@keyframes swAnim{0%,100%{height:4px;opacity:.4}50%{height:28px;opacity:1}}
+</style>
+
 <div class="bwrap" id="bwrap">
   <div class="btip">📢 相手に見せる</div>
   <div class="bubble" id="bubble"></div>
@@ -522,6 +598,21 @@ function showResult(t) {
   document.getElementById('bcap').textContent=
     dir==='ja'?'↑ フィリピン語を相手に見せてください':'↑ 日本語を相手に見せてください';
   document.getElementById('bwrap').className='bwrap show';
+  // 大きな読み上げボタン表示
+  const sz = document.getElementById('speak-zone');
+  sz.style.display = 'block';
+  // ラベルを方向に合わせる
+  const lbl = document.getElementById('big-speak-label');
+  const ico = document.getElementById('big-speak-icon');
+  if(dir==='ja'){
+    lbl.textContent='タガログ語で読み上げる';
+    ico.textContent='🔊';
+  } else {
+    lbl.textContent='日本語で読み上げる';
+    ico.textContent='🔊';
+  }
+  // 音声リスト更新
+  populateVoiceList2();
 }
 
 // ════════════════════════
@@ -669,6 +760,131 @@ function onVoiceChange() {
   }
 }
 
+// ════════════════════════
+// BIG SPEAK BUTTON
+// ════════════════════════
+let selectedVoice2 = null;
+let isSpeaking = false;
+
+function bigSpeak() {
+  if (!translated) return;
+
+  if (isSpeaking) {
+    // 再生中ならキャンセル
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    const btn = document.getElementById('big-speak-btn');
+    btn.classList.remove('speaking');
+    document.getElementById('big-speak-icon').textContent = '🔊';
+    document.getElementById('big-speak-label').textContent =
+      dir==='ja' ? 'タガログ語で読み上げる' : '日本語で読み上げる';
+    document.getElementById('speak-wave').style.display = 'none';
+    return;
+  }
+
+  const lang = dir==='ja' ? 'tl-PH' : 'ja-JP';
+  speechSynthesis.cancel();
+
+  const speak = () => {
+    const u = new SpeechSynthesisUtterance(translated);
+    u.lang = lang;
+
+    // 音声選択（手動 or 自動）
+    const voice = selectedVoice2 || getBestVoice(lang);
+    if (voice) u.voice = voice;
+
+    // スライダー値を取得
+    const rateEl  = document.getElementById('rate-slider2');
+    const pitchEl = document.getElementById('pitch-slider2');
+    u.rate   = rateEl  ? parseFloat(rateEl.value)  : (lang==='tl-PH' ? 0.82 : 0.85);
+    u.pitch  = pitchEl ? parseFloat(pitchEl.value) : (lang==='tl-PH' ? 1.05 : 1.00);
+    u.volume = 1.0;
+
+    // ボタンを「再生中」状態に
+    const btn = document.getElementById('big-speak-btn');
+    btn.classList.add('speaking');
+    document.getElementById('big-speak-icon').textContent = '⏹';
+    document.getElementById('big-speak-label').textContent = '停止する';
+    document.getElementById('speak-wave').style.display = 'flex';
+    isSpeaking = true;
+
+    u.onend = u.onerror = () => {
+      isSpeaking = false;
+      btn.classList.remove('speaking');
+      document.getElementById('big-speak-icon').textContent = '🔊';
+      document.getElementById('big-speak-label').textContent =
+        dir==='ja' ? 'タガログ語で読み上げる' : '日本語で読み上げる';
+      document.getElementById('speak-wave').style.display = 'none';
+    };
+
+    speechSynthesis.speak(u);
+  };
+
+  const voices = speechSynthesis.getVoices();
+  if (voices.length) {
+    setTimeout(speak, isIOS ? 300 : 0);
+  } else {
+    speechSynthesis.onvoiceschanged = () => {
+      speechSynthesis.onvoiceschanged = null;
+      setTimeout(speak, isIOS ? 300 : 0);
+    };
+  }
+}
+
+function populateVoiceList2() {
+  const voices = speechSynthesis.getVoices();
+  const lang = dir==='ja' ? 'tl-PH' : 'ja-JP';
+  const langShort = lang.split('-')[0];
+  const sel = document.getElementById('voice-select2');
+  if (!sel) return;
+
+  const relevant = voices.filter(v =>
+    v.lang === lang || v.lang.startsWith(langShort) ||
+    v.name.toLowerCase().includes(langShort)
+  );
+
+  sel.innerHTML = '<option value="">自動選択（推奨）</option>';
+  relevant.forEach((v,i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = v.name + ' (' + v.lang + ')' + (v.localService ? ' 📱' : ' 🌐');
+    opt.dataset.voiceName = v.name;
+    sel.appendChild(opt);
+  });
+
+  // 自動選択された音声名を表示
+  const best = getBestVoice(lang);
+  const nameEl = document.getElementById('voice-name-display');
+  if (nameEl) nameEl.textContent = best ? best.name : '不明';
+
+  if (relevant.length === 0) {
+    sel.innerHTML = '<option value="">この言語の音声が見つかりません</option>';
+  }
+}
+
+function onVoiceChange2() {
+  const sel = document.getElementById('voice-select2');
+  const name = sel.options[sel.selectedIndex]?.dataset.voiceName;
+  if (name) {
+    const voices = speechSynthesis.getVoices();
+    selectedVoice2 = voices.find(v => v.name === name) || null;
+  } else {
+    selectedVoice2 = null;
+  }
+  // 選択した音声名を表示
+  const nameEl = document.getElementById('voice-name-display');
+  if (nameEl) nameEl.textContent = selectedVoice2 ? selectedVoice2.name : '自動選択中...';
+}
+
+function toggleSpeakSettings() {
+  const el = document.getElementById('speak-settings');
+  const btn = document.getElementById('speak-settings-toggle');
+  const isHidden = el.style.display === 'none';
+  el.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '⚙️ 音声設定を閉じる' : '⚙️ 音声設定';
+  if (isHidden) populateVoiceList2();
+}
+
 function copyOut(){
   if(!translated)return;
   navigator.clipboard.writeText(translated)
@@ -681,6 +897,9 @@ function clearAll(){
   document.getElementById('out-text').className='ocard-body ph';
   document.getElementById('out-acts').className='ocard-acts';
   document.getElementById('bwrap').className='bwrap';
+  document.getElementById('speak-zone').style.display='none';
+  document.getElementById('speak-wave').style.display='none';
+  document.getElementById('big-speak-btn').classList.remove('speaking');
   translated=''; setStatus(''); setStep('idle');
   speechSynthesis.cancel();
 }
