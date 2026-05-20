@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🇯🇵⇄🇵🇭 自動翻訳</title>
+<title>🇯🇵⇄🇵🇭 翻訳</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -19,416 +18,323 @@ html,body{height:100%;}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);
   display:flex;flex-direction:column;align-items:center;min-height:100vh;padding-bottom:48px;}
 
-/* ── SETUP SCREEN ── */
-#setup{
-position:fixed;inset:0;z-index:999;
-background:var(–bg);display:flex;flex-direction:column;
-align-items:center;justify-content:center;padding:24px;
-}
-.setup-card{
-width:100%;max-width:420px;background:var(–card);
-border-radius:24px;box-shadow:0 8px 40px rgba(0,0,0,.12);padding:28px 24px;
-}
-.setup-logo{text-align:center;font-size:38px;margin-bottom:8px;}
-.setup-title{text-align:center;font-size:20px;font-weight:900;margin-bottom:4px;}
-.setup-sub{text-align:center;font-size:12px;color:var(–muted);margin-bottom:20px;line-height:1.6;}
-.setup-label{font-size:12px;font-weight:700;color:var(–text);margin-bottom:6px;display:block;letter-spacing:.05em;}
-.setup-input{
-width:100%;padding:12px 14px;border-radius:12px;
-border:2px solid var(–border);outline:none;
-font-size:14px;font-family:inherit;color:var(–text);
-background:#fafafa;margin-bottom:8px;transition:border-color .2s;
-}
-.setup-input:focus{border-color:var(–ja);}
-.setup-hint{font-size:11px;color:var(–muted);margin-bottom:20px;line-height:1.6;}
-.setup-hint a{color:#1a73e8;text-decoration:none;}
-.setup-btn{
-width:100%;padding:14px;border-radius:13px;border:none;
-background:var(–ja);color:#fff;font-size:16px;font-weight:700;
-font-family:inherit;cursor:pointer;
-box-shadow:0 4px 16px rgba(26,26,46,.25);transition:all .2s;
-}
-.setup-btn:active{transform:scale(.98);}
-.setup-err{font-size:12px;color:var(–accent);text-align:center;margin-top:10px;min-height:18px;}
-.setup-skip{text-align:center;margin-top:14px;font-size:12px;color:var(–muted);cursor:pointer;text-decoration:underline;}
-
-/* ── MAIN APP ── */
-#app{display:none;width:100%;flex-direction:column;align-items:center;}
-#app.show{display:flex;}
-
-header{
-width:100%;max-width:500px;padding:16px 16px 6px;
-display:flex;align-items:center;justify-content:center;gap:8px;
-position:relative;
-}
-.flag{font-size:24px;}
-.htitle{font-size:16px;font-weight:900;}
-.harrow{color:var(–accent);font-size:18px;margin:0 4px;}
-.api-badge{
-position:absolute;right:16px;
-background:#eee;border:none;border-radius:8px;
-padding:4px 10px;font-size:11px;color:var(–muted);cursor:pointer;font-family:inherit;
-}
+/* HEADER */
+header{width:100%;max-width:500px;padding:20px 16px 8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;}
+.flag{font-size:26px;}
+.htitle{font-size:17px;font-weight:900;}
+.harrow{color:var(--accent);font-size:20px;margin:0 6px;}
 
 /* TABS */
-.tabs{width:100%;max-width:500px;padding:0 16px 12px;display:flex;gap:8px;}
-.tab{
-flex:1;padding:9px 4px;text-align:center;border-radius:12px;
-border:2px solid var(–border);background:var(–card);color:var(–muted);
-font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;
-}
-.tab.ja {background:var(–ja); color:#fff;border-color:var(–ja);}
-.tab.fil{background:var(–fil);color:#fff;border-color:var(–fil);}
-.swapt{
-width:40px;flex-shrink:0;border-radius:12px;
-border:2px solid var(–border);background:var(–card);font-size:16px;cursor:pointer;
-display:flex;align-items:center;justify-content:center;
-transition:transform .4s cubic-bezier(.68,-.55,.27,1.55);
-}
+.tabs{width:100%;max-width:500px;padding:0 16px 14px;display:flex;gap:8px;}
+.tab{flex:1;padding:10px 4px;text-align:center;border-radius:13px;
+  border:2px solid var(--border);background:var(--card);color:var(--muted);
+  font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;}
+.tab.ja{background:var(--ja);color:#fff;border-color:var(--ja);}
+.tab.fil{background:var(--fil);color:#fff;border-color:var(--fil);}
+.swapt{width:42px;flex-shrink:0;border-radius:13px;
+  border:2px solid var(--border);background:var(--card);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .4s cubic-bezier(.68,-.55,.27,1.55);}
 .swapt:active{transform:rotate(180deg);}
 
 /* INPUT CARD */
-.mic-zone{width:calc(100% - 32px);max-width:468px;margin-bottom:12px;}
-.mic-card{background:var(–card);border-radius:var(–r);box-shadow:var(–sh);overflow:hidden;}
-.mic-top{display:flex;align-items:center;gap:12px;padding:14px 16px 10px;}
+.icard{width:calc(100% - 32px);max-width:468px;
+  background:var(--card);border-radius:var(--r);box-shadow:var(--sh);
+  margin-bottom:12px;overflow:hidden;}
+.icard-top{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 6px;}
+.icard-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.4;}
+.char-cnt{font-size:11px;color:var(--muted);}
 
-/* マイクボタン（Chrome用） */
-.big-mic-btn{
-width:60px;height:60px;border-radius:50%;flex-shrink:0;
-border:none;cursor:pointer;color:#fff;
-display:flex;align-items:center;justify-content:center;
-box-shadow:0 4px 16px rgba(26,26,46,.28);transition:background .2s;
+/* iOS音声入力案内 */
+.ios-guide{
+  display:none;
+  background:#e8f4fd;border-bottom:1px solid #b3d9f7;
+  padding:10px 16px;font-size:12px;color:#1565c0;line-height:1.7;
 }
-.big-mic-btn svg{width:26px;height:26px;fill:currentColor;}
-.big-mic-btn.ja-mode {background:var(–ja);}
-.big-mic-btn.fil-mode{background:var(–fil);}
-.big-mic-btn.active  {background:var(–accent)!important;animation:pulse 1.1s infinite;}
-.big-mic-btn.ios-hide{display:none;}
-@keyframes pulse{
-0%  {box-shadow:0 0 0 0   rgba(231,76,60,.5);}
-70% {box-shadow:0 0 0 18px rgba(231,76,60,0);}
-100%{box-shadow:0 0 0 0   rgba(231,76,60,0);}
+.ios-guide b{font-size:13px;}
+
+/* テキスト入力 */
+.vin-wrap{padding:4px 16px 10px;position:relative;}
+textarea.vin{
+  width:100%;min-height:90px;max-height:150px;
+  border:2px solid var(--border);border-radius:12px;
+  outline:none;resize:none;padding:10px 36px 10px 12px;
+  font-size:20px;line-height:1.65;font-family:inherit;
+  color:var(--text);background:#fafafa;transition:border-color .2s;
 }
-.wv{display:none;align-items:flex-end;gap:3px;height:24px;}
-.big-mic-btn.active .wv{display:flex;}
-.big-mic-btn.active svg{display:none;}
-.wb{width:4px;border-radius:3px;background:#fff;animation:wba 1s infinite ease-in-out;}
+textarea.vin:focus{border-color:var(--ja);}
+textarea.vin.fil:focus{border-color:var(--fil);}
+.vin-clear{position:absolute;right:24px;top:12px;background:none;border:none;
+  font-size:18px;color:var(--muted);cursor:pointer;padding:4px;}
+
+/* フロー＆ボタン行 */
+.action-row{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 16px 14px;border-top:1px solid var(--border);
+}
+/* マイクボタン（Chrome/Android用） */
+.mic-btn{
+  width:48px;height:48px;border-radius:50%;border:none;
+  background:var(--ja);color:#fff;flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px rgba(26,26,46,.28);transition:all .2s;
+}
+.mic-btn svg{width:22px;height:22px;fill:currentColor;}
+.mic-btn.listening{background:var(--accent);animation:pulse 1.1s infinite;}
+.mic-btn.fil-mode{background:var(--fil);}
+.mic-btn.ios-hide{display:none;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(231,76,60,.5)}70%{box-shadow:0 0 0 16px rgba(231,76,60,0)}100%{box-shadow:0 0 0 0 rgba(231,76,60,0)}}
+.wv{display:none;align-items:flex-end;gap:3px;height:22px;}
+.mic-btn.listening .wv{display:flex;}
+.mic-btn.listening svg{display:none;}
+.wb{width:3px;border-radius:3px;background:#fff;animation:wba 1s infinite ease-in-out;}
 .wb:nth-child(1){animation-delay:0s}.wb:nth-child(2){animation-delay:.15s}
 .wb:nth-child(3){animation-delay:.3s}.wb:nth-child(4){animation-delay:.45s}
 .wb:nth-child(5){animation-delay:.6s}
-@keyframes wba{0%,100%{height:4px;opacity:.4}50%{height:20px;opacity:1}}
+@keyframes wba{0%,100%{height:3px;opacity:.4}50%{height:18px;opacity:1}}
 
-.mic-info{flex:1;}
-.mic-hint{font-size:14px;font-weight:700;color:var(–text);margin-bottom:2px;}
-.mic-sub {font-size:11px;color:var(–muted);line-height:1.5;}
-
-/* テキスト入力 */
-.vin-wrap{padding:0 16px 12px;position:relative;}
-textarea.vin{
-width:100%;min-height:80px;max-height:140px;
-border:2px solid var(–border);border-radius:12px;
-outline:none;resize:none;padding:10px 38px 10px 12px;
-font-size:19px;line-height:1.65;font-family:inherit;
-color:var(–text);background:#fafafa;transition:border-color .2s;
-}
-textarea.vin:focus{border-color:var(–ja);}
-textarea.vin.fil-focus:focus{border-color:var(–fil);}
-.vin-clear{
-position:absolute;right:24px;top:10px;
-background:none;border:none;font-size:18px;
-color:var(–muted);cursor:pointer;padding:4px;
-}
-.char-cnt{text-align:right;font-size:11px;color:var(–muted);margin-top:2px;}
-
-/* フロー */
-.steps{display:flex;align-items:center;justify-content:center;gap:5px;padding:4px 16px 0;font-size:11px;}
-.st{display:flex;align-items:center;gap:3px;padding:5px 9px;border-radius:20px;
-background:#eee;color:var(–muted);font-weight:700;transition:all .3s;}
-.st.on  {background:var(–accent);color:#fff;}
-.st.done{background:var(–green); color:#fff;}
-.st.on.t{background:var(–orange);}
-.st.on.s{background:var(–green);}
-.st-arr{color:#ccc;font-size:13px;}
+/* ステップ */
+.steps{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;}
+.st{font-size:10px;font-weight:700;padding:4px 8px;border-radius:20px;
+  background:#eee;color:var(--muted);transition:all .3s;white-space:nowrap;}
+.st.on{background:var(--accent);color:#fff;}
+.st.done{background:var(--green);color:#fff;}
+.st.on.t{background:var(--orange);}
+.st.on.s{background:var(--green);}
+.st-a{font-size:11px;color:#ccc;}
 
 /* 翻訳ボタン */
-.tr-row{padding:10px 16px 14px;}
 .tr-btn{
-width:100%;padding:14px;border-radius:13px;border:none;
-color:#fff;font-size:15px;font-weight:700;font-family:inherit;
-cursor:pointer;box-shadow:0 4px 14px rgba(26,26,46,.22);
-transition:opacity .2s,transform .2s;
-display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 18px;border-radius:13px;border:none;flex-shrink:0;
+  color:#fff;font-size:14px;font-weight:700;font-family:inherit;
+  cursor:pointer;box-shadow:0 3px 12px rgba(26,26,46,.22);
+  transition:all .2s;display:flex;align-items:center;gap:6px;
 }
-/* ★ Fix: ボタン色は data-dir で制御 → setDir()によるクラス上書き問題を回避 */
-.tr-btn[data-dir=“ja”] {background:var(–ja);}
-.tr-btn[data-dir=“fil”]{background:var(–fil);}
+.tr-btn[data-dir="ja"]{background:var(--ja);}
+.tr-btn[data-dir="fil"]{background:var(--fil);}
 .tr-btn.loading{opacity:.55;cursor:wait;}
-.tr-btn:active{transform:scale(.98);}
-
-/* iOS案内 */
-.ios-hint{
-width:calc(100% - 32px);max-width:468px;
-background:#e8f4fd;border:1.5px solid #90caf9;
-border-radius:14px;padding:11px 14px;margin-bottom:10px;
-font-size:12px;color:#1565c0;line-height:1.7;display:none;
-}
-.ios-hint b{display:block;margin-bottom:3px;font-size:13px;}
-
-.cors-warn{
-width:calc(100% - 32px);max-width:468px;
-background:#fff8e1;border:1.5px solid #ffe082;
-border-radius:14px;padding:11px 14px;margin-bottom:10px;
-font-size:12px;color:#7a6000;line-height:1.7;
-}
-.cors-warn b{display:block;font-size:13px;margin-bottom:3px;}
+.tr-btn:active{transform:scale(.97);}
 
 /* STATUS */
 .sb{width:100%;max-width:500px;text-align:center;
-padding:4px 16px 6px;font-size:12px;color:var(–muted);min-height:22px;}
-.sb.err{color:var(–accent);}
-.sb.ok {color:var(–green);}
+  padding:4px 16px 6px;font-size:12px;color:var(--muted);min-height:22px;}
+.sb.err{color:var(--accent);}
+.sb.ok{color:var(--green);}
 
 /* OUTPUT CARD */
 .ocard{width:calc(100% - 32px);max-width:468px;
-background:#fdf9f6;border:2px solid var(–border);
-border-radius:var(–r);margin-bottom:10px;overflow:hidden;}
-.ocard-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 4px;}
+  background:#fdf9f6;border:2px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;overflow:hidden;}
+.ocard-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 4px;}
 .ocard-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-color:var(–accent);opacity:.75;}
-.ocard-body{font-size:21px;line-height:1.65;padding:4px 14px 14px;
-color:var(–text);min-height:56px;word-break:break-word;}
+  color:var(--accent);opacity:.75;}
+.ocard-body{font-size:22px;line-height:1.65;padding:4px 14px 16px;
+  color:var(--text);min-height:60px;word-break:break-word;}
 .ocard-body.ph{color:#ccc;font-size:14px;}
-.ocard-acts{display:none;gap:8px;padding:8px 14px 12px;border-top:1px solid var(–border);}
+.ocard-acts{display:none;gap:8px;padding:8px 14px 12px;border-top:1px solid var(--border);}
 .ocard-acts.show{display:flex;}
-.abt{padding:8px 14px;border-radius:10px;border:1.5px solid var(–border);background:#fff;
-font-size:12px;cursor:pointer;font-family:inherit;
-display:flex;align-items:center;gap:4px;color:var(–text);transition:all .15s;}
-.abt:hover{background:#f5f5f5;}
-.abt.sp{background:var(–accent);color:#fff;border-color:var(–accent);}
+.abt{padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:#fff;
+  font-size:12px;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:4px;color:var(--text);transition:all .15s;}
+.abt.sp{background:var(--accent);color:#fff;border-color:var(--accent);}
 
 /* BUBBLE */
-.bwrap{display:none;width:calc(100% - 32px);max-width:468px;margin-bottom:20px;}
+.bwrap{display:none;width:calc(100% - 32px);max-width:468px;margin-bottom:24px;}
 .bwrap.show{display:block;}
 .btip{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-color:var(–muted);margin-bottom:8px;}
-.bubble{background:var(–accent);color:#fff;border-radius:20px 20px 20px 5px;
-padding:18px 22px;font-size:28px;font-weight:900;line-height:1.45;word-break:break-word;
-box-shadow:0 6px 28px rgba(231,76,60,.28);
-animation:pop .3s cubic-bezier(.68,-.55,.27,1.55);}
-.bubble.ja{background:var(–ja);border-radius:20px 20px 5px 20px;
-box-shadow:0 6px 28px rgba(26,26,46,.22);}
+  color:var(--muted);margin-bottom:8px;}
+.bubble{color:#fff;border-radius:20px 20px 20px 5px;
+  padding:20px 24px;font-size:30px;font-weight:900;line-height:1.45;
+  word-break:break-word;
+  animation:pop .3s cubic-bezier(.68,-.55,.27,1.55);}
+.bubble.fil-bubble{background:var(--accent);box-shadow:0 8px 32px rgba(231,76,60,.28);}
+.bubble.ja-bubble{background:var(--ja);border-radius:20px 20px 5px 20px;
+  box-shadow:0 8px 32px rgba(26,26,46,.22);}
 @keyframes pop{from{opacity:0;transform:scale(.85) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bcap{margin-top:8px;font-size:12px;color:var(–muted);text-align:center;}
-</style>
+.bcap{margin-top:10px;font-size:12px;color:var(--muted);text-align:center;}
 
+/* セキュリティバッジ */
+.sec-badge{
+  width:calc(100% - 32px);max-width:468px;
+  background:#f0fff4;border:1px solid #86efac;
+  border-radius:12px;padding:10px 14px;
+  font-size:11px;color:#166534;line-height:1.6;
+  display:flex;gap:8px;align-items:flex-start;
+  margin-bottom:8px;
+}
+</style>
 </head>
 <body>
 
-<!-- ══ SETUP SCREEN ══ -->
+<header>
+  <span class="flag">🇯🇵</span>
+  <span class="htitle">日本語</span>
+  <span class="harrow">⇄</span>
+  <span class="htitle">Filipino</span>
+  <span class="flag">🇵🇭</span>
+</header>
 
-<div id="setup">
-  <div class="setup-card">
-    <div class="setup-logo">🇯🇵⇄🇵🇭</div>
-    <div class="setup-title">日本語 · Filipino 翻訳</div>
-    <div class="setup-sub">Anthropic APIキーを入力してください。<br>キーはこのデバイス内にのみ保存されます。</div>
-    <label class="setup-label">Anthropic APIキー</label>
-    <input class="setup-input" type="password" id="api-key-input"
-      placeholder="sk-ant-..." autocomplete="off" spellcheck="false"
-      onkeydown="if(event.key==='Enter')saveKey()">
-    <div class="setup-hint">
-      APIキーは <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> で取得できます。<br>
-      入力したキーはブラウザのlocalStorageに保存され、このデバイス外には送信されません。
-    </div>
-    <button class="setup-btn" onclick="saveKey()">✅ 保存して開始</button>
-    <div class="setup-err" id="setup-err"></div>
-    <div class="setup-skip" onclick="startApp()">キーなしで続ける（翻訳は使えません）</div>
-  </div>
+<div class="tabs">
+  <button class="tab ja" id="tab-ja" onclick="setDir('ja')">🇯🇵 日本語 → Filipino</button>
+  <button class="swapt" onclick="swapDir()">⇄</button>
+  <button class="tab" id="tab-fil" onclick="setDir('fil')">Filipino → 🇯🇵 日本語</button>
 </div>
 
-<!-- ══ MAIN APP ══ -->
+<!-- セキュリティバッジ -->
+<div class="sec-badge">
+  🔒 <span>APIキー不要・個人情報の送信なし・翻訳テキストのみGoogle翻訳に送信されます</span>
+</div>
 
-<div id="app">
-  <header>
-    <span class="flag">🇯🇵</span>
-    <span class="htitle">日本語</span>
-    <span class="harrow">⇄</span>
-    <span class="htitle">Filipino</span>
-    <span class="flag">🇵🇭</span>
-    <button class="api-badge" onclick="showSetup()">🔑 APIキー</button>
-  </header>
-
-  <div class="cors-warn" id="cors-warn" style="display:none">
-    <b>⚠️ 翻訳APIに接続するには</b>
-    このアプリを <b>GitHub Pages の URL</b> で開いてください。
-  </div>
-  <div class="tabs">
-    <button class="tab ja"  id="tab-ja"  onclick="setDir('ja')">🇯🇵 日本語 → Filipino</button>
-    <button class="swapt" onclick="swapDir()">⇄</button>
-    <button class="tab"    id="tab-fil" onclick="setDir('fil')">Filipino → 🇯🇵 日本語</button>
+<div class="icard">
+  <div class="icard-top">
+    <span class="icard-lbl" id="in-lbl">日本語で入力</span>
+    <span class="char-cnt"><span id="vcnt">0</span>/500</span>
   </div>
 
-  <!-- iOS向け案内（Safari検出時のみ表示） -->
-
-  <div class="ios-hint" id="ios-hint" style="display:none">
-    <b>📱 iPhoneでの音声入力方法</b>
-    テキストボックスをタップ → キーボード右下の <b>🎤</b> を押して話す → 「翻訳する」ボタンを押す
+  <!-- iOS音声入力ガイド -->
+  <div class="ios-guide" id="ios-guide">
+    <b>📱 音声入力：</b>下のボックスをタップ → キーボード右下の <b>🎤</b> を押して話す → 翻訳ボタン
   </div>
 
-  <div class="mic-zone">
-    <div class="mic-card">
-      <div class="mic-top">
-        <!-- ★ Fix: クラスでなくdata属性でモード管理 → setDir()の上書き問題を回避 -->
-        <button class="big-mic-btn ja-mode" id="big-mic" onclick="onMicTap()">
-          <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm6.07 9.21a.75.75 0 0 1 .82.67A7 7 0 0 1 12.75 17.93V20h1.75a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h1.75v-2.07A7 7 0 0 1 5.11 10.88a.75.75 0 1 1 1.49.15A5.5 5.5 0 0 0 17.5 11a.75.75 0 0 1 .57-.79z"/></svg>
-          <div class="wv"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div>
-        </button>
-        <div class="mic-info">
-          <div class="mic-hint" id="mic-hint">🎤 タップして音声入力</div>
-          <div class="mic-sub"  id="mic-sub">またはテキストボックスに直接入力</div>
-        </div>
-      </div>
-
-```
   <div class="vin-wrap">
     <textarea class="vin" id="vin" rows="3"
-      placeholder="ここをタップして入力。キーボードの🎤で音声入力"
+      placeholder="ここをタップして入力してください"
       inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false"
       oninput="onVinInput()" onkeydown="onVinKey(event)"></textarea>
     <button class="vin-clear" onclick="clearVin()">✕</button>
-    <div class="char-cnt"><span id="vcnt">0</span>/500</div>
   </div>
 
-  <div class="steps">
-    <div class="st" id="s1">🎤 音声</div>
-    <span class="st-arr">→</span>
-    <div class="st" id="s2">🔄 翻訳</div>
-    <span class="st-arr">→</span>
-    <div class="st" id="s3">🔊 読み上げ</div>
-  </div>
+  <div class="action-row">
+    <!-- マイクボタン（iOS以外） -->
+    <button class="mic-btn" id="mic-btn" onclick="onMicTap()">
+      <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm6.07 9.21a.75.75 0 0 1 .82.67A7 7 0 0 1 12.75 17.93V20h1.75a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h1.75v-2.07A7 7 0 0 1 5.11 10.88a.75.75 0 1 1 1.49.15A5.5 5.5 0 0 0 17.5 11a.75.75 0 0 1 .57-.79z"/></svg>
+      <div class="wv"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div>
+    </button>
 
-  <div class="tr-row">
-    <!-- ★ Fix: data-dir属性でボタン色を管理 -->
+    <div class="steps">
+      <div class="st" id="s1">🎤</div>
+      <span class="st-a">→</span>
+      <div class="st" id="s2">🔄</div>
+      <span class="st-a">→</span>
+      <div class="st" id="s3">🔊</div>
+    </div>
+
     <button class="tr-btn" id="tr-btn" data-dir="ja" onclick="doTranslate()">
-      <span id="tr-icon">🔄</span><span id="tr-txt">翻訳する</span>
+      <span id="tr-icon">🔄</span><span id="tr-txt">翻訳</span>
     </button>
   </div>
 </div>
-```
 
+<div class="sb" id="sb"></div>
+
+<div class="ocard">
+  <div class="ocard-hd">
+    <span class="ocard-lbl" id="out-lbl">翻訳結果（Filipino）</span>
+    <button class="abt" style="font-size:11px;padding:4px 10px" onclick="clearAll()">✕</button>
   </div>
-
-  <div class="sb" id="sb"></div>
-
-  <div class="ocard">
-    <div class="ocard-hd">
-      <span class="ocard-lbl" id="out-lbl">翻訳結果（Filipino）</span>
-      <button class="abt" style="font-size:11px;padding:4px 10px" onclick="clearAll()">✕ クリア</button>
-    </div>
-    <div class="ocard-body ph" id="out-text">翻訳がここに表示されます</div>
-    <div class="ocard-acts" id="out-acts">
-      <button class="abt sp" onclick="speakAgain()">🔊 もう一度</button>
-      <button class="abt" onclick="copyOut()">📋 コピー</button>
-    </div>
+  <div class="ocard-body ph" id="out-text">翻訳がここに表示されます</div>
+  <div class="ocard-acts" id="out-acts">
+    <button class="abt sp" onclick="speakAgain()">🔊 読み上げ</button>
+    <button class="abt" onclick="copyOut()">📋 コピー</button>
   </div>
+</div>
 
-  <div class="bwrap" id="bwrap">
-    <div class="btip">📢 相手に見せる（大きく表示）</div>
-    <div class="bubble" id="bubble"></div>
-    <div class="bcap"   id="bcap"></div>
-  </div>
+<div class="bwrap" id="bwrap">
+  <div class="btip">📢 相手に見せる</div>
+  <div class="bubble" id="bubble"></div>
+  <div class="bcap" id="bcap"></div>
 </div>
 
 <script>
 // ════════════════════════
-// GLOBALS
+// STATE
 // ════════════════════════
 let dir='ja', translated='', phase='idle';
-let recog=null, listening=false, inputTimer=null;
-let apiKey='';
+let recog=null, listening=false, blurTimer=null;
 let isIOS=false, hasSR=false;
+
+// ════════════════════════
+// TRANSLATE APIs（優先順位順）
+// ════════════════════════
+const APIS = [
+  // 1. Google Translate (gtx client - ブラウザからCORS許可)
+  async (text, from, to) => {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${from}&tl=${to}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('gtx:'+res.status);
+    const data = await res.json();
+    return data[0].map(x=>x[0]).filter(Boolean).join('');
+  },
+  // 2. MyMemory (フォールバック)
+  async (text, from, to) => {
+    const langMap = {ja:'ja', tl:'tl'};
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+    const res = await fetch(url, {headers:{'User-Agent':'Mozilla/5.0'}});
+    if (!res.ok) throw new Error('mymemory:'+res.status);
+    const data = await res.json();
+    if (data.responseStatus !== 200) throw new Error('mymemory:'+data.responseStatus);
+    return data.responseData.translatedText;
+  },
+  // 3. Lingva Translate (オープンソースGoogle翻訳代替)
+  async (text, from, to) => {
+    const url = `https://lingva.ml/api/v1/${from}/${to}/${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('lingva:'+res.status);
+    const data = await res.json();
+    return data.translation;
+  }
+];
+
+// 言語コードマッピング
+function getLangCode(dir, side) {
+  // side: 'from' or 'to'
+  if (dir === 'ja') return side === 'from' ? 'ja' : 'tl';
+  return side === 'from' ? 'tl' : 'ja';
+}
 
 // ════════════════════════
 // INIT
 // ════════════════════════
-window.addEventListener('load', ()=>{
-  try{ apiKey=localStorage.getItem('anthropic_api_key')||''; }catch(e){}
-  if(apiKey){ startApp(); }
-  else{ document.getElementById('setup').style.display='flex'; }
-});
+window.addEventListener('load', () => {
+  isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-function saveKey(){
-  const val=document.getElementById('api-key-input').value.trim();
-  const err=document.getElementById('setup-err');
-  if(!val){ err.textContent='APIキーを入力してください'; return; }
-  // ★ Fix: sk-ant- のみでなく sk- で始まる形式を許容（将来の形式変更に対応）
-  if(!val.startsWith('sk-')){ err.textContent='有効なAPIキーは sk- で始まります'; return; }
-  try{ localStorage.setItem('anthropic_api_key',val); }catch(e){}
-  apiKey=val; err.textContent=''; startApp();
-}
-
-function startApp(){
-  document.getElementById('setup').style.display='none';
-  document.getElementById('app').classList.add('show');
-
-  // ★ Fix: startApp()後にbind → appが表示されてからblurイベントを登録
-  document.getElementById('vin').addEventListener('blur', onVinBlur);
-
-  detectEnv();
-}
-
-function showSetup(){
-  document.getElementById('api-key-input').value=apiKey;
-  document.getElementById('setup-err').textContent='';
-  document.getElementById('setup').style.display='flex';
-}
-
-// ════════════════════════
-// ENV DETECTION
-// ════════════════════════
-function detectEnv(){
-  hasSR = !!(window.SpeechRecognition||window.webkitSpeechRecognition);
-  isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-
-  const micBtn=document.getElementById('big-mic');
-
-  if(!hasSR||isIOS){
-    // ★ Fix: ios-hideクラスで非表示（setDir内でja-mode/fil-modeだけ変えてもios-hideは維持）
-    micBtn.classList.add('ios-hide');
-    document.getElementById('mic-hint').textContent='📱 キーボード🎤で音声入力';
-    document.getElementById('mic-sub').textContent='テキストボックスタップ → 右下🎤 → 翻訳ボタン';
-    document.getElementById('ios-hint').style.display='block';
+  if (isIOS || !hasSR) {
+    document.getElementById('mic-btn').classList.add('ios-hide');
+    document.getElementById('ios-guide').style.display = 'block';
   }
 
-}
+  // blurで自動翻訳（iOS音声入力完了検知）
+  document.getElementById('vin').addEventListener('blur', () => {
+    if (blurTimer) clearTimeout(blurTimer);
+    const v = document.getElementById('vin').value.trim();
+    if (isIOS && v && phase === 'idle') {
+      blurTimer = setTimeout(() => doTranslate(), 600);
+    }
+  });
+});
 
 // ════════════════════════
 // DIRECTION
 // ════════════════════════
-function setDir(d){
-  dir=d;
-  document.getElementById('tab-ja').className ='tab'+(d==='ja' ?' ja' :'');
-  document.getElementById('tab-fil').className='tab'+(d==='fil'?' fil':'');
-  document.getElementById('out-lbl').textContent=d==='ja'?'翻訳結果（Filipino）':'翻訳結果（日本語）';
-
-  // ★ Fix: tr-btn の色は data-dir 属性 + CSSで制御（classList操作なし）
-  document.getElementById('tr-btn').dataset.dir=d;
-  document.getElementById('tr-txt').textContent=d==='ja'?'翻訳する':'Isalin';
-
-  // ★ Fix: マイクボタンはios-hideを保持しつつ色だけ変更
-  const micBtn=document.getElementById('big-mic');
-  micBtn.classList.remove('ja-mode','fil-mode');
-  micBtn.classList.add(d==='ja'?'ja-mode':'fil-mode');
-
-  // textarea focus色
-  document.getElementById('vin').className='vin'+(d==='fil'?' fil-focus':'');
-  document.getElementById('vin').placeholder=d==='ja'
-    ?'ここをタップして入力 / キーボード🎤で音声入力'
-    :'I-tap dito / 🎤 sa keyboard';
-
+function setDir(d) {
+  dir = d;
+  document.getElementById('tab-ja').className  = 'tab'+(d==='ja'?' ja':'');
+  document.getElementById('tab-fil').className = 'tab'+(d==='fil'?' fil':'');
+  document.getElementById('in-lbl').textContent  = d==='ja'?'日本語で入力':'Filipino na i-type';
+  document.getElementById('out-lbl').textContent = d==='ja'?'翻訳結果（Filipino）':'翻訳結果（日本語）';
+  document.getElementById('tr-btn').dataset.dir  = d;
+  document.getElementById('tr-txt').textContent  = d==='ja'?'翻訳':'Isalin';
+  document.getElementById('vin').className = 'vin'+(d==='fil'?' fil':'');
+  document.getElementById('vin').placeholder = d==='ja'?'ここをタップして入力してください':'I-tap dito para mag-type';
+  const mic = document.getElementById('mic-btn');
+  mic.classList.remove('ja-mode','fil-mode');
+  mic.classList.add(d==='ja'?'ja-mode':'fil-mode');
   clearAll();
 }
-
-function swapDir(){
+function swapDir() {
   const b=document.querySelector('.swapt');
   b.style.transform='rotate(180deg)';
   setTimeout(()=>b.style.transform='',380);
@@ -436,257 +342,171 @@ function swapDir(){
 }
 
 // ════════════════════════
-// INPUT & BLUR
+// INPUT
 // ════════════════════════
-function onVinInput(){
-  const v=document.getElementById('vin').value;
-  document.getElementById('vcnt').textContent=Math.min(v.length,500);
-  if(inputTimer)clearTimeout(inputTimer);
-  // ★ Fix: タイマー自動翻訳は廃止（blurで制御）→ 意図しない翻訳を防ぐ
+function onVinInput() {
+  const v = document.getElementById('vin').value;
+  document.getElementById('vcnt').textContent = Math.min(v.length,500);
 }
-
-function onVinKey(e){
-  if(e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();
-    if(inputTimer)clearTimeout(inputTimer);
-    doTranslate();
-  }
+function onVinKey(e) {
+  if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); doTranslate(); }
 }
-
-// ★ Fix: blur自動翻訳 → iOSキーボードマイク入力完了時のみ発火させる
-// 「翻訳ボタン押下によるblur」は doTranslate内でフラグ管理
-let blurFromBtn=false;
-function onVinBlur(){
-  if(blurFromBtn){ blurFromBtn=false; return; }
-  if(inputTimer)clearTimeout(inputTimer);
-  const v=document.getElementById('vin').value.trim();
-  // iOS音声入力完了後（isIOSのみ自動翻訳）
-  if(isIOS&&v&&phase==='idle'){
-    inputTimer=setTimeout(()=>doTranslate(),500);
-  }
-}
-
-function clearVin(){
+function clearVin() {
   document.getElementById('vin').value='';
   document.getElementById('vcnt').textContent='0';
-  if(inputTimer)clearTimeout(inputTimer);
+  if (blurTimer) clearTimeout(blurTimer);
 }
-
-// ════════════════════════
-// WEB SPEECH API（Chrome）
-// ════════════════════════
-async function onMicTap(){
-  if(listening){ stopRecog(); return; }
-  if(phase!=='idle') return;
-  if(!hasSR||isIOS) return;
-
-  try{
-    const s=await navigator.mediaDevices.getUserMedia({audio:true});
-    s.getTracks().forEach(t=>t.stop());
-  }catch(err){
-    const m={NotAllowedError:'⚠️ マイクが拒否されました。ブラウザ設定を確認してください',
-             NotFoundError:'⚠️ マイクが見つかりません'};
-    setStatus(m[err.name]||'⚠️ マイクエラー: '+err.name,'err'); return;
-  }
-
-  if(recog){try{recog.abort();}catch(e){}recog=null;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();
-  recog.lang=dir==='ja'?'ja-JP':'tl-PH';
-  recog.interimResults=true; recog.continuous=false; recog.maxAlternatives=1;
-
-  let finalText='', gotFinal=false;
-
-  recog.onstart=()=>{
-    listening=true;
-    document.getElementById('big-mic').classList.add('active');
-    setStep('listen'); setStatus('');
-  };
-  recog.onresult=(e)=>{
-    let interim=''; finalText=''; gotFinal=false;
-    for(const r of e.results){
-      if(r.isFinal){finalText+=r[0].transcript; gotFinal=true;}
-      else interim+=r[0].transcript;
-    }
-    const shown=finalText||interim;
-    document.getElementById('vin').value=shown;
-    document.getElementById('vcnt').textContent=shown.length;
-  };
-  recog.onend=()=>{
-    listening=false; recog=null;
-    document.getElementById('big-mic').classList.remove('active');
-    if(gotFinal&&finalText.trim()){ doTranslate(); }
-    else{ setStep('idle'); if(!gotFinal)setStatus('音声を認識できませんでした。もう一度試してください','err'); }
-  };
-  recog.onerror=(e)=>{
-    listening=false; recog=null;
-    document.getElementById('big-mic').classList.remove('active');
-    setStep('idle');
-    const m={'not-allowed':'⚠️ マイクが拒否されました','no-speech':'音声が検出されませんでした。もう少し大きな声で',
-      'network':'ネットワークエラー','aborted':'','service-not-allowed':'⚠️ Chromeで直接ファイルを開いてください'};
-    const msg=m[e.error]??('エラー: '+e.error);
-    if(msg)setStatus(msg,'err');
-  };
-  try{ recog.start(); }
-  catch(e){ setStatus('音声認識を開始できませんでした','err'); recog=null; setStep('idle'); }
-}
-function stopRecog(){ if(recog){try{recog.stop();}catch(e){}} }
 
 // ════════════════════════
 // TRANSLATE
 // ════════════════════════
-async function doTranslate(){
-  blurFromBtn=true;
+async function doTranslate() {
+  const text = document.getElementById('vin').value.trim();
+  if (!text) { setStatus('テキストを入力してください','err'); return; }
+  if (phase !== 'idle') return;
 
-  if(!apiKey){
-    setStatus('⚠️ APIキーが未設定です。右上🔑から設定してください','err');
-    showSetup(); return;
+  setStep('translate');
+  const from = getLangCode(dir,'from');
+  const to   = getLangCode(dir,'to');
+
+  let result = null;
+  let lastErr = '';
+
+  // APIを順番に試す
+  for (let i=0; i<APIS.length; i++) {
+    try {
+      result = await APIS[i](text, from, to);
+      if (result && result.trim()) break;
+    } catch(e) {
+      lastErr = e.message;
+      continue;
+    }
   }
-  const text=document.getElementById('vin').value.trim();
-  if(!text){ setStatus('⚠️ テキストを入力してください','err'); return; }
-  if(phase!=='idle') return;
 
-  // blob: プロトコル（Claude.aiプレビュー）のみブロック
-  if(window.location.protocol==='blob:'){
+  if (!result || !result.trim()) {
     setStep('idle');
-    setStatus('⚠️ GitHub PagesのURLで開いてください','err');
+    setStatus('翻訳に失敗しました。ネットワークを確認してください。','err');
     return;
   }
 
-  setStep('translate');
-  const fromLang=dir==='ja'?'日本語':'Filipino (Tagalog)';
-  const toLang  =dir==='ja'?'Filipino (Tagalog)':'日本語';
-
-  try{
-    let res;
-    try{
-      res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':apiKey,
-          'anthropic-version':'2023-06-01'
-        },
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          system:`You are a professional translator. Translate from ${fromLang} to ${toLang}.
-OUTPUT ONLY the translated text. No notes, no quotes, no explanations, no romanization.
-Use natural everyday spoken language. Match the original tone (polite/casual/urgent).
-For Filipino: use standard Tagalog widely understood across the Philippines.`,
-          messages:[{role:'user',content:text}]
-        })
-      });
-    }catch(fetchErr){
-      // fetch自体失敗 = CORS or ネットワーク切断
-        throw new Error('NETWORK');
-    }
-
-    // JSON以外が返ってきた場合（CORSブロック時にHTMLが返ることがある）
-    const ct=res.headers.get('content-type')||'';
-    if(!ct.includes('application/json')){
-        throw new Error('NETWORK');
-    }
-
-    if(!res.ok){
-      const errBody=await res.json().catch(()=>({}));
-      if(res.status===401) throw new Error('AUTH');
-      if(res.status===429) throw new Error('RATE');
-      throw new Error(errBody.error?.message||'HTTP '+res.status);
-    }
-
-    const data=await res.json();
-    const t=data.content?.[0]?.text?.trim();
-    if(!t) throw new Error('EMPTY');
-    showResult(t);
-    autoSpeak(t);
-
-  }catch(e){
-    setStep('idle');
-    if(e.message==='AUTH'){
-      setStatus('⚠️ APIキーが無効です。右上🔑から再設定してください','err');
-      showSetup();
-    } else if(e.message==='RATE'){
-      setStatus('⚠️ リクエスト制限中。数秒待ってから再試行してください','err');
-    } else if(e.message==='NETWORK'){
-      setStatus('⚠️ ネットワークエラー。通信状況を確認してください','err');
-    } else if(e.message==='EMPTY'){
-      setStatus('⚠️ 翻訳結果が空でした。もう一度試してください','err');
-    } else {
-      setStatus('❌ エラー: '+e.message,'err');
-    }
-  }
+  showResult(result.trim());
+  autoSpeak(result.trim());
 }
 
 // ════════════════════════
 // SPEAK
 // ════════════════════════
-function autoSpeak(text){
+function autoSpeak(text) {
   setStep('speak');
-  const lang=dir==='ja'?'tl-PH':'ja-JP';
+  const lang = dir==='ja'?'tl-PH':'ja-JP';
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
+  const u = new SpeechSynthesisUtterance(text);
   u.lang=lang; u.rate=0.88;
-  // ★ Fix: iOSのspeechSynthesis bug対策 → 少し遅延して発話
-  setTimeout(()=>speechSynthesis.speak(u), isIOS?300:0);
-  u.onend  =()=>{ setStep('idle'); setStatus('✅ 完了！もう一度話すには入力エリアをタップ','ok'); setTimeout(()=>setStatus(''),4000); };
-  u.onerror=()=>{ setStep('idle'); setStatus('翻訳完了（読み上げ音声が端末にない場合があります）','err'); };
+  setTimeout(()=>speechSynthesis.speak(u), isIOS?250:0);
+  u.onend  = ()=>{ setStep('idle'); setStatus('✅ 完了！','ok'); setTimeout(()=>setStatus(''),3000); };
+  u.onerror= ()=>{ setStep('idle'); };
 }
-function speakAgain(){ if(translated) autoSpeak(translated); }
+function speakAgain() { if(translated) autoSpeak(translated); }
 
 // ════════════════════════
 // SHOW RESULT
 // ════════════════════════
-function showResult(t){
-  translated=t;
-  const el=document.getElementById('out-text');
+function showResult(t) {
+  translated = t;
+  const el = document.getElementById('out-text');
   el.textContent=t; el.className='ocard-body';
   document.getElementById('out-acts').className='ocard-acts show';
   document.getElementById('bubble').textContent=t;
-  document.getElementById('bubble').className='bubble'+(dir==='fil'?' ja':'');
+  document.getElementById('bubble').className='bubble '+(dir==='ja'?'fil-bubble':'ja-bubble');
   document.getElementById('bcap').textContent=
     dir==='ja'?'↑ フィリピン語を相手に見せてください':'↑ 日本語を相手に見せてください';
   document.getElementById('bwrap').className='bwrap show';
 }
 
 // ════════════════════════
-// STEP INDICATOR
+// MIC（Chrome/Android）
 // ════════════════════════
-function setStep(s){
+async function onMicTap() {
+  if (listening) { stopMic(); return; }
+  if (phase!=='idle') return;
+
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  if (!SR) return;
+
+  try {
+    const s=await navigator.mediaDevices.getUserMedia({audio:true});
+    s.getTracks().forEach(t=>t.stop());
+  } catch(err) {
+    const m={NotAllowedError:'マイクが拒否されました',NotFoundError:'マイクが見つかりません'};
+    setStatus('⚠️ '+(m[err.name]||err.name),'err'); return;
+  }
+
+  if (recog) { try{recog.abort();}catch(e){} recog=null; }
+  recog = new SR();
+  recog.lang = dir==='ja'?'ja-JP':'tl-PH';
+  recog.interimResults=true; recog.continuous=false; recog.maxAlternatives=1;
+
+  let finalText='', gotFinal=false;
+
+  recog.onstart = ()=>{
+    listening=true;
+    document.getElementById('mic-btn').classList.add('listening');
+    setStep('listen'); setStatus('');
+  };
+  recog.onresult = (e)=>{
+    let interim=''; finalText=''; gotFinal=false;
+    for(const r of e.results){
+      if(r.isFinal){finalText+=r[0].transcript;gotFinal=true;}
+      else interim+=r[0].transcript;
+    }
+    const shown=finalText||interim;
+    document.getElementById('vin').value=shown;
+    document.getElementById('vcnt').textContent=shown.length;
+  };
+  recog.onend = ()=>{
+    listening=false; recog=null;
+    document.getElementById('mic-btn').classList.remove('listening');
+    if(gotFinal&&finalText.trim()) doTranslate();
+    else { setStep('idle'); if(!gotFinal) setStatus('音声を認識できませんでした','err'); }
+  };
+  recog.onerror = (e)=>{
+    listening=false; recog=null;
+    document.getElementById('mic-btn').classList.remove('listening');
+    setStep('idle');
+    const m={'not-allowed':'マイクが拒否されました','no-speech':'音声が検出されませんでした',
+      'network':'ネットワークエラー','aborted':''};
+    const msg=m[e.error]??('エラー: '+e.error);
+    if(msg) setStatus('⚠️ '+msg,'err');
+  };
+  try { recog.start(); }
+  catch(e){ setStatus('音声認識を開始できませんでした','err'); recog=null; setStep('idle'); }
+}
+function stopMic(){ if(recog){try{recog.stop();}catch(e){}} }
+
+// ════════════════════════
+// STEP & UTILS
+// ════════════════════════
+function setStep(s) {
   phase=s;
   const s1=document.getElementById('s1');
   const s2=document.getElementById('s2');
   const s3=document.getElementById('s3');
-  // ★ Fix: クラスをリセットしてから付与（t/sクラスを毎回正しく設定）
-  s1.className='st';
-  s2.className='st';
-  s3.className='st';
+  s1.className='st'; s2.className='st'; s3.className='st';
   const btn=document.getElementById('tr-btn');
   const ico=document.getElementById('tr-icon');
   const txt=document.getElementById('tr-txt');
-  if(s==='listen'){
-    s1.classList.add('on');
-    btn.classList.add('loading');
-  } else if(s==='translate'){
-    s1.classList.add('done'); s2.classList.add('on');
-    btn.classList.add('loading'); ico.textContent='⏳'; txt.textContent='翻訳中…';
-  } else if(s==='speak'){
-    s1.classList.add('done'); s2.classList.add('done'); s3.classList.add('on');
-    btn.classList.remove('loading'); ico.textContent='🔊'; txt.textContent='読み上げ中…';
-  } else {
-    btn.classList.remove('loading');
-    ico.textContent='🔄';
-    txt.textContent=dir==='ja'?'翻訳する':'Isalin';
-  }
+  if(s==='listen'){s1.classList.add('on');btn.classList.add('loading');}
+  else if(s==='translate'){s1.classList.add('done');s2.classList.add('on','t');
+    btn.classList.add('loading');ico.textContent='⏳';txt.textContent='翻訳中…';}
+  else if(s==='speak'){s1.classList.add('done');s2.classList.add('done');s3.classList.add('on','s');
+    btn.classList.remove('loading');ico.textContent='🔊';txt.textContent='読み上げ中…';}
+  else{btn.classList.remove('loading');ico.textContent='🔄';
+    txt.textContent=dir==='ja'?'翻訳':'Isalin';}
 }
-
-// ════════════════════════
-// UTILS
-// ════════════════════════
 function copyOut(){
   if(!translated)return;
   navigator.clipboard.writeText(translated)
-    .then(()=>{ setStatus('📋 コピーしました！','ok'); setTimeout(()=>setStatus(''),2000); })
+    .then(()=>{setStatus('📋 コピーしました！','ok');setTimeout(()=>setStatus(''),2000);})
     .catch(()=>setStatus('コピーできませんでした','err'));
 }
 function clearAll(){
@@ -704,703 +524,5 @@ function setStatus(msg,type=''){
   el.className='sb'+(type?' '+type:'');
 }
 </script>
-
-</body>
-</html>TYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🇯🇵⇄🇵🇭 自動翻訳</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-:root {
-  --ja:#1a1a2e; --fil:#b03030; --accent:#e74c3c;
-  --bg:#f2ede9; --card:#fff; --border:#ddd8d0;
-  --muted:#999; --text:#1a1a2e;
-  --green:#219150; --orange:#d4690a;
-  --r:18px; --sh:0 3px 20px rgba(0,0,0,.09);
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);
-  display:flex;flex-direction:column;align-items:center;min-height:100vh;padding-bottom:48px;}
-
-/* ── SETUP SCREEN ── */
-#setup{
-position:fixed;inset:0;z-index:999;
-background:var(–bg);display:flex;flex-direction:column;
-align-items:center;justify-content:center;padding:24px;
-}
-.setup-card{
-width:100%;max-width:420px;background:var(–card);
-border-radius:24px;box-shadow:0 8px 40px rgba(0,0,0,.12);padding:28px 24px;
-}
-.setup-logo{text-align:center;font-size:38px;margin-bottom:8px;}
-.setup-title{text-align:center;font-size:20px;font-weight:900;margin-bottom:4px;}
-.setup-sub{text-align:center;font-size:12px;color:var(–muted);margin-bottom:20px;line-height:1.6;}
-.setup-label{font-size:12px;font-weight:700;color:var(–text);margin-bottom:6px;display:block;letter-spacing:.05em;}
-.setup-input{
-width:100%;padding:12px 14px;border-radius:12px;
-border:2px solid var(–border);outline:none;
-font-size:14px;font-family:inherit;color:var(–text);
-background:#fafafa;margin-bottom:8px;transition:border-color .2s;
-}
-.setup-input:focus{border-color:var(–ja);}
-.setup-hint{font-size:11px;color:var(–muted);margin-bottom:20px;line-height:1.6;}
-.setup-hint a{color:#1a73e8;text-decoration:none;}
-.setup-btn{
-width:100%;padding:14px;border-radius:13px;border:none;
-background:var(–ja);color:#fff;font-size:16px;font-weight:700;
-font-family:inherit;cursor:pointer;
-box-shadow:0 4px 16px rgba(26,26,46,.25);transition:all .2s;
-}
-.setup-btn:active{transform:scale(.98);}
-.setup-err{font-size:12px;color:var(–accent);text-align:center;margin-top:10px;min-height:18px;}
-.setup-skip{text-align:center;margin-top:14px;font-size:12px;color:var(–muted);cursor:pointer;text-decoration:underline;}
-
-/* ── MAIN APP ── */
-#app{display:none;width:100%;flex-direction:column;align-items:center;}
-#app.show{display:flex;}
-
-header{
-width:100%;max-width:500px;padding:16px 16px 6px;
-display:flex;align-items:center;justify-content:center;gap:8px;
-position:relative;
-}
-.flag{font-size:24px;}
-.htitle{font-size:16px;font-weight:900;}
-.harrow{color:var(–accent);font-size:18px;margin:0 4px;}
-.api-badge{
-position:absolute;right:16px;
-background:#eee;border:none;border-radius:8px;
-padding:4px 10px;font-size:11px;color:var(–muted);cursor:pointer;font-family:inherit;
-}
-
-/* TABS */
-.tabs{width:100%;max-width:500px;padding:0 16px 12px;display:flex;gap:8px;}
-.tab{
-flex:1;padding:9px 4px;text-align:center;border-radius:12px;
-border:2px solid var(–border);background:var(–card);color:var(–muted);
-font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;
-}
-.tab.ja {background:var(–ja); color:#fff;border-color:var(–ja);}
-.tab.fil{background:var(–fil);color:#fff;border-color:var(–fil);}
-.swapt{
-width:40px;flex-shrink:0;border-radius:12px;
-border:2px solid var(–border);background:var(–card);font-size:16px;cursor:pointer;
-display:flex;align-items:center;justify-content:center;
-transition:transform .4s cubic-bezier(.68,-.55,.27,1.55);
-}
-.swapt:active{transform:rotate(180deg);}
-
-/* INPUT CARD */
-.mic-zone{width:calc(100% - 32px);max-width:468px;margin-bottom:12px;}
-.mic-card{background:var(–card);border-radius:var(–r);box-shadow:var(–sh);overflow:hidden;}
-.mic-top{display:flex;align-items:center;gap:12px;padding:14px 16px 10px;}
-
-/* マイクボタン（Chrome用） */
-.big-mic-btn{
-width:60px;height:60px;border-radius:50%;flex-shrink:0;
-border:none;cursor:pointer;color:#fff;
-display:flex;align-items:center;justify-content:center;
-box-shadow:0 4px 16px rgba(26,26,46,.28);transition:background .2s;
-}
-.big-mic-btn svg{width:26px;height:26px;fill:currentColor;}
-.big-mic-btn.ja-mode {background:var(–ja);}
-.big-mic-btn.fil-mode{background:var(–fil);}
-.big-mic-btn.active  {background:var(–accent)!important;animation:pulse 1.1s infinite;}
-.big-mic-btn.ios-hide{display:none;}
-@keyframes pulse{
-0%  {box-shadow:0 0 0 0   rgba(231,76,60,.5);}
-70% {box-shadow:0 0 0 18px rgba(231,76,60,0);}
-100%{box-shadow:0 0 0 0   rgba(231,76,60,0);}
-}
-.wv{display:none;align-items:flex-end;gap:3px;height:24px;}
-.big-mic-btn.active .wv{display:flex;}
-.big-mic-btn.active svg{display:none;}
-.wb{width:4px;border-radius:3px;background:#fff;animation:wba 1s infinite ease-in-out;}
-.wb:nth-child(1){animation-delay:0s}.wb:nth-child(2){animation-delay:.15s}
-.wb:nth-child(3){animation-delay:.3s}.wb:nth-child(4){animation-delay:.45s}
-.wb:nth-child(5){animation-delay:.6s}
-@keyframes wba{0%,100%{height:4px;opacity:.4}50%{height:20px;opacity:1}}
-
-.mic-info{flex:1;}
-.mic-hint{font-size:14px;font-weight:700;color:var(–text);margin-bottom:2px;}
-.mic-sub {font-size:11px;color:var(–muted);line-height:1.5;}
-
-/* テキスト入力 */
-.vin-wrap{padding:0 16px 12px;position:relative;}
-textarea.vin{
-width:100%;min-height:80px;max-height:140px;
-border:2px solid var(–border);border-radius:12px;
-outline:none;resize:none;padding:10px 38px 10px 12px;
-font-size:19px;line-height:1.65;font-family:inherit;
-color:var(–text);background:#fafafa;transition:border-color .2s;
-}
-textarea.vin:focus{border-color:var(–ja);}
-textarea.vin.fil-focus:focus{border-color:var(–fil);}
-.vin-clear{
-position:absolute;right:24px;top:10px;
-background:none;border:none;font-size:18px;
-color:var(–muted);cursor:pointer;padding:4px;
-}
-.char-cnt{text-align:right;font-size:11px;color:var(–muted);margin-top:2px;}
-
-/* フロー */
-.steps{display:flex;align-items:center;justify-content:center;gap:5px;padding:4px 16px 0;font-size:11px;}
-.st{display:flex;align-items:center;gap:3px;padding:5px 9px;border-radius:20px;
-background:#eee;color:var(–muted);font-weight:700;transition:all .3s;}
-.st.on  {background:var(–accent);color:#fff;}
-.st.done{background:var(–green); color:#fff;}
-.st.on.t{background:var(–orange);}
-.st.on.s{background:var(–green);}
-.st-arr{color:#ccc;font-size:13px;}
-
-/* 翻訳ボタン */
-.tr-row{padding:10px 16px 14px;}
-.tr-btn{
-width:100%;padding:14px;border-radius:13px;border:none;
-color:#fff;font-size:15px;font-weight:700;font-family:inherit;
-cursor:pointer;box-shadow:0 4px 14px rgba(26,26,46,.22);
-transition:opacity .2s,transform .2s;
-display:flex;align-items:center;justify-content:center;gap:8px;
-}
-/* ★ Fix: ボタン色は data-dir で制御 → setDir()によるクラス上書き問題を回避 */
-.tr-btn[data-dir=“ja”] {background:var(–ja);}
-.tr-btn[data-dir=“fil”]{background:var(–fil);}
-.tr-btn.loading{opacity:.55;cursor:wait;}
-.tr-btn:active{transform:scale(.98);}
-
-/* iOS案内 */
-.ios-hint{
-width:calc(100% - 32px);max-width:468px;
-background:#e8f4fd;border:1.5px solid #90caf9;
-border-radius:14px;padding:11px 14px;margin-bottom:10px;
-font-size:12px;color:#1565c0;line-height:1.7;display:none;
-}
-.ios-hint b{display:block;margin-bottom:3px;font-size:13px;}
-
-.cors-warn b{display:block;font-size:13px;margin-bottom:3px;}
-
-/* STATUS */
-.sb{width:100%;max-width:500px;text-align:center;
-padding:4px 16px 6px;font-size:12px;color:var(–muted);min-height:22px;}
-.sb.err{color:var(–accent);}
-.sb.ok {color:var(–green);}
-
-/* OUTPUT CARD */
-.ocard{width:calc(100% - 32px);max-width:468px;
-background:#fdf9f6;border:2px solid var(–border);
-border-radius:var(–r);margin-bottom:10px;overflow:hidden;}
-.ocard-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 4px;}
-.ocard-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-color:var(–accent);opacity:.75;}
-.ocard-body{font-size:21px;line-height:1.65;padding:4px 14px 14px;
-color:var(–text);min-height:56px;word-break:break-word;}
-.ocard-body.ph{color:#ccc;font-size:14px;}
-.ocard-acts{display:none;gap:8px;padding:8px 14px 12px;border-top:1px solid var(–border);}
-.ocard-acts.show{display:flex;}
-.abt{padding:8px 14px;border-radius:10px;border:1.5px solid var(–border);background:#fff;
-font-size:12px;cursor:pointer;font-family:inherit;
-display:flex;align-items:center;gap:4px;color:var(–text);transition:all .15s;}
-.abt:hover{background:#f5f5f5;}
-.abt.sp{background:var(–accent);color:#fff;border-color:var(–accent);}
-
-/* BUBBLE */
-.bwrap{display:none;width:calc(100% - 32px);max-width:468px;margin-bottom:20px;}
-.bwrap.show{display:block;}
-.btip{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-color:var(–muted);margin-bottom:8px;}
-.bubble{background:var(–accent);color:#fff;border-radius:20px 20px 20px 5px;
-padding:18px 22px;font-size:28px;font-weight:900;line-height:1.45;word-break:break-word;
-box-shadow:0 6px 28px rgba(231,76,60,.28);
-animation:pop .3s cubic-bezier(.68,-.55,.27,1.55);}
-.bubble.ja{background:var(–ja);border-radius:20px 20px 5px 20px;
-box-shadow:0 6px 28px rgba(26,26,46,.22);}
-@keyframes pop{from{opacity:0;transform:scale(.85) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bcap{margin-top:8px;font-size:12px;color:var(–muted);text-align:center;}
-</style>
-
-</head>
-<body>
-
-<!-- ══ SETUP SCREEN ══ -->
-
-<div id="setup">
-  <div class="setup-card">
-    <div class="setup-logo">🇯🇵⇄🇵🇭</div>
-    <div class="setup-title">日本語 · Filipino 翻訳</div>
-    <div class="setup-sub">Anthropic APIキーを入力してください。<br>キーはこのデバイス内にのみ保存されます。</div>
-    <label class="setup-label">Anthropic APIキー</label>
-    <input class="setup-input" type="password" id="api-key-input"
-      placeholder="sk-ant-..." autocomplete="off" spellcheck="false"
-      onkeydown="if(event.key==='Enter')saveKey()">
-    <div class="setup-hint">
-      APIキーは <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> で取得できます。<br>
-      入力したキーはブラウザのlocalStorageに保存され、このデバイス外には送信されません。
-    </div>
-    <button class="setup-btn" onclick="saveKey()">✅ 保存して開始</button>
-    <div class="setup-err" id="setup-err"></div>
-    <div class="setup-skip" onclick="startApp()">キーなしで続ける（翻訳は使えません）</div>
-  </div>
-</div>
-
-<!-- ══ MAIN APP ══ -->
-
-<div id="app">
-  <header>
-    <span class="flag">🇯🇵</span>
-    <span class="htitle">日本語</span>
-    <span class="harrow">⇄</span>
-    <span class="htitle">Filipino</span>
-    <span class="flag">🇵🇭</span>
-    <button class="api-badge" onclick="showSetup()">🔑 APIキー</button>
-  </header>
-
-  <div class="tabs">
-    <button class="tab ja"  id="tab-ja"  onclick="setDir('ja')">🇯🇵 日本語 → Filipino</button>
-    <button class="swapt" onclick="swapDir()">⇄</button>
-    <button class="tab"    id="tab-fil" onclick="setDir('fil')">Filipino → 🇯🇵 日本語</button>
-  </div>
-
-  <!-- iOS向け案内（Safari検出時のみ表示） -->
-
-  <div class="ios-hint" id="ios-hint" style="display:none">
-    <b>📱 iPhoneでの音声入力方法</b>
-    テキストボックスをタップ → キーボード右下の <b>🎤</b> を押して話す → 「翻訳する」ボタンを押す
-  </div>
-
-  <div class="mic-zone">
-    <div class="mic-card">
-      <div class="mic-top">
-        <!-- ★ Fix: クラスでなくdata属性でモード管理 → setDir()の上書き問題を回避 -->
-        <button class="big-mic-btn ja-mode" id="big-mic" onclick="onMicTap()">
-          <svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm6.07 9.21a.75.75 0 0 1 .82.67A7 7 0 0 1 12.75 17.93V20h1.75a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5h1.75v-2.07A7 7 0 0 1 5.11 10.88a.75.75 0 1 1 1.49.15A5.5 5.5 0 0 0 17.5 11a.75.75 0 0 1 .57-.79z"/></svg>
-          <div class="wv"><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div><div class="wb"></div></div>
-        </button>
-        <div class="mic-info">
-          <div class="mic-hint" id="mic-hint">🎤 タップして音声入力</div>
-          <div class="mic-sub"  id="mic-sub">またはテキストボックスに直接入力</div>
-        </div>
-      </div>
-
-```
-  <div class="vin-wrap">
-    <textarea class="vin" id="vin" rows="3"
-      placeholder="ここをタップして入力。キーボードの🎤で音声入力"
-      inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false"
-      oninput="onVinInput()" onkeydown="onVinKey(event)"></textarea>
-    <button class="vin-clear" onclick="clearVin()">✕</button>
-    <div class="char-cnt"><span id="vcnt">0</span>/500</div>
-  </div>
-
-  <div class="steps">
-    <div class="st" id="s1">🎤 音声</div>
-    <span class="st-arr">→</span>
-    <div class="st" id="s2">🔄 翻訳</div>
-    <span class="st-arr">→</span>
-    <div class="st" id="s3">🔊 読み上げ</div>
-  </div>
-
-  <div class="tr-row">
-    <!-- ★ Fix: data-dir属性でボタン色を管理 -->
-    <button class="tr-btn" id="tr-btn" data-dir="ja" onclick="doTranslate()">
-      <span id="tr-icon">🔄</span><span id="tr-txt">翻訳する</span>
-    </button>
-  </div>
-</div>
-```
-
-  </div>
-
-  <div class="sb" id="sb"></div>
-
-  <div class="ocard">
-    <div class="ocard-hd">
-      <span class="ocard-lbl" id="out-lbl">翻訳結果（Filipino）</span>
-      <button class="abt" style="font-size:11px;padding:4px 10px" onclick="clearAll()">✕ クリア</button>
-    </div>
-    <div class="ocard-body ph" id="out-text">翻訳がここに表示されます</div>
-    <div class="ocard-acts" id="out-acts">
-      <button class="abt sp" onclick="speakAgain()">🔊 もう一度</button>
-      <button class="abt" onclick="copyOut()">📋 コピー</button>
-    </div>
-  </div>
-
-  <div class="bwrap" id="bwrap">
-    <div class="btip">📢 相手に見せる（大きく表示）</div>
-    <div class="bubble" id="bubble"></div>
-    <div class="bcap"   id="bcap"></div>
-  </div>
-</div>
-
-<script>
-// ════════════════════════
-// GLOBALS
-// ════════════════════════
-let dir='ja', translated='', phase='idle';
-let recog=null, listening=false, inputTimer=null;
-let apiKey='';
-let isIOS=false, hasSR=false;
-
-// ════════════════════════
-// INIT
-// ════════════════════════
-window.addEventListener('load', ()=>{
-  try{ apiKey=localStorage.getItem('anthropic_api_key')||''; }catch(e){}
-  if(apiKey){ startApp(); }
-  else{ document.getElementById('setup').style.display='flex'; }
-});
-
-function saveKey(){
-  const val=document.getElementById('api-key-input').value.trim();
-  const err=document.getElementById('setup-err');
-  if(!val){ err.textContent='APIキーを入力してください'; return; }
-  // ★ Fix: sk-ant- のみでなく sk- で始まる形式を許容（将来の形式変更に対応）
-  if(!val.startsWith('sk-')){ err.textContent='有効なAPIキーは sk- で始まります'; return; }
-  try{ localStorage.setItem('anthropic_api_key',val); }catch(e){}
-  apiKey=val; err.textContent=''; startApp();
-}
-
-function startApp(){
-  document.getElementById('setup').style.display='none';
-  document.getElementById('app').classList.add('show');
-
-  // ★ Fix: startApp()後にbind → appが表示されてからblurイベントを登録
-  document.getElementById('vin').addEventListener('blur', onVinBlur);
-
-  detectEnv();
-}
-
-function showSetup(){
-  document.getElementById('api-key-input').value=apiKey;
-  document.getElementById('setup-err').textContent='';
-  document.getElementById('setup').style.display='flex';
-}
-
-// ════════════════════════
-// ENV DETECTION
-// ════════════════════════
-function detectEnv(){
-  hasSR = !!(window.SpeechRecognition||window.webkitSpeechRecognition);
-  isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-
-  const micBtn=document.getElementById('big-mic');
-
-  if(!hasSR||isIOS){
-    // ★ Fix: ios-hideクラスで非表示（setDir内でja-mode/fil-modeだけ変えてもios-hideは維持）
-    micBtn.classList.add('ios-hide');
-    document.getElementById('mic-hint').textContent='📱 キーボード🎤で音声入力';
-    document.getElementById('mic-sub').textContent='テキストボックスタップ → 右下🎤 → 翻訳ボタン';
-    document.getElementById('ios-hint').style.display='block';
-  }
-
-}
-
-// ════════════════════════
-// DIRECTION
-// ════════════════════════
-function setDir(d){
-  dir=d;
-  document.getElementById('tab-ja').className ='tab'+(d==='ja' ?' ja' :'');
-  document.getElementById('tab-fil').className='tab'+(d==='fil'?' fil':'');
-  document.getElementById('out-lbl').textContent=d==='ja'?'翻訳結果（Filipino）':'翻訳結果（日本語）';
-
-  // ★ Fix: tr-btn の色は data-dir 属性 + CSSで制御（classList操作なし）
-  document.getElementById('tr-btn').dataset.dir=d;
-  document.getElementById('tr-txt').textContent=d==='ja'?'翻訳する':'Isalin';
-
-  // ★ Fix: マイクボタンはios-hideを保持しつつ色だけ変更
-  const micBtn=document.getElementById('big-mic');
-  micBtn.classList.remove('ja-mode','fil-mode');
-  micBtn.classList.add(d==='ja'?'ja-mode':'fil-mode');
-
-  // textarea focus色
-  document.getElementById('vin').className='vin'+(d==='fil'?' fil-focus':'');
-  document.getElementById('vin').placeholder=d==='ja'
-    ?'ここをタップして入力 / キーボード🎤で音声入力'
-    :'I-tap dito / 🎤 sa keyboard';
-
-  clearAll();
-}
-
-function swapDir(){
-  const b=document.querySelector('.swapt');
-  b.style.transform='rotate(180deg)';
-  setTimeout(()=>b.style.transform='',380);
-  setDir(dir==='ja'?'fil':'ja');
-}
-
-// ════════════════════════
-// INPUT & BLUR
-// ════════════════════════
-function onVinInput(){
-  const v=document.getElementById('vin').value;
-  document.getElementById('vcnt').textContent=Math.min(v.length,500);
-  if(inputTimer)clearTimeout(inputTimer);
-  // ★ Fix: タイマー自動翻訳は廃止（blurで制御）→ 意図しない翻訳を防ぐ
-}
-
-function onVinKey(e){
-  if(e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();
-    if(inputTimer)clearTimeout(inputTimer);
-    doTranslate();
-  }
-}
-
-// ★ Fix: blur自動翻訳 → iOSキーボードマイク入力完了時のみ発火させる
-// 「翻訳ボタン押下によるblur」は doTranslate内でフラグ管理
-let blurFromBtn=false;
-function onVinBlur(){
-  if(blurFromBtn){ blurFromBtn=false; return; }
-  if(inputTimer)clearTimeout(inputTimer);
-  const v=document.getElementById('vin').value.trim();
-  // iOS音声入力完了後（isIOSのみ自動翻訳）
-  if(isIOS&&v&&phase==='idle'){
-    inputTimer=setTimeout(()=>doTranslate(),500);
-  }
-}
-
-function clearVin(){
-  document.getElementById('vin').value='';
-  document.getElementById('vcnt').textContent='0';
-  if(inputTimer)clearTimeout(inputTimer);
-}
-
-// ════════════════════════
-// WEB SPEECH API（Chrome）
-// ════════════════════════
-async function onMicTap(){
-  if(listening){ stopRecog(); return; }
-  if(phase!=='idle') return;
-  if(!hasSR||isIOS) return;
-
-  try{
-    const s=await navigator.mediaDevices.getUserMedia({audio:true});
-    s.getTracks().forEach(t=>t.stop());
-  }catch(err){
-    const m={NotAllowedError:'⚠️ マイクが拒否されました。ブラウザ設定を確認してください',
-             NotFoundError:'⚠️ マイクが見つかりません'};
-    setStatus(m[err.name]||'⚠️ マイクエラー: '+err.name,'err'); return;
-  }
-
-  if(recog){try{recog.abort();}catch(e){}recog=null;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR();
-  recog.lang=dir==='ja'?'ja-JP':'tl-PH';
-  recog.interimResults=true; recog.continuous=false; recog.maxAlternatives=1;
-
-  let finalText='', gotFinal=false;
-
-  recog.onstart=()=>{
-    listening=true;
-    document.getElementById('big-mic').classList.add('active');
-    setStep('listen'); setStatus('');
-  };
-  recog.onresult=(e)=>{
-    let interim=''; finalText=''; gotFinal=false;
-    for(const r of e.results){
-      if(r.isFinal){finalText+=r[0].transcript; gotFinal=true;}
-      else interim+=r[0].transcript;
-    }
-    const shown=finalText||interim;
-    document.getElementById('vin').value=shown;
-    document.getElementById('vcnt').textContent=shown.length;
-  };
-  recog.onend=()=>{
-    listening=false; recog=null;
-    document.getElementById('big-mic').classList.remove('active');
-    if(gotFinal&&finalText.trim()){ doTranslate(); }
-    else{ setStep('idle'); if(!gotFinal)setStatus('音声を認識できませんでした。もう一度試してください','err'); }
-  };
-  recog.onerror=(e)=>{
-    listening=false; recog=null;
-    document.getElementById('big-mic').classList.remove('active');
-    setStep('idle');
-    const m={'not-allowed':'⚠️ マイクが拒否されました','no-speech':'音声が検出されませんでした。もう少し大きな声で',
-      'network':'ネットワークエラー','aborted':'','service-not-allowed':'⚠️ Chromeで直接ファイルを開いてください'};
-    const msg=m[e.error]??('エラー: '+e.error);
-    if(msg)setStatus(msg,'err');
-  };
-  try{ recog.start(); }
-  catch(e){ setStatus('音声認識を開始できませんでした','err'); recog=null; setStep('idle'); }
-}
-function stopRecog(){ if(recog){try{recog.stop();}catch(e){}} }
-
-// ════════════════════════
-// TRANSLATE
-// ════════════════════════
-async function doTranslate(){
-  blurFromBtn=true;
-
-  if(!apiKey){
-    setStatus('⚠️ APIキーが未設定です。右上🔑から設定してください','err');
-    showSetup(); return;
-  }
-  const text=document.getElementById('vin').value.trim();
-  if(!text){ setStatus('⚠️ テキストを入力してください','err'); return; }
-  if(phase!=='idle') return;
-
-  // blob: プロトコル（Claude.aiプレビュー）のみブロック
-  if(window.location.protocol==='blob:'){
-    setStep('idle');
-    setStatus('⚠️ GitHub PagesのURLで開いてください','err');
-    return;
-  }
-
-  setStep('translate');
-  const fromLang=dir==='ja'?'日本語':'Filipino (Tagalog)';
-  const toLang  =dir==='ja'?'Filipino (Tagalog)':'日本語';
-
-  try{
-    let res;
-    try{
-      res=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key':apiKey,
-          'anthropic-version':'2023-06-01'
-        },
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          system:`You are a professional translator. Translate from ${fromLang} to ${toLang}.
-OUTPUT ONLY the translated text. No notes, no quotes, no explanations, no romanization.
-Use natural everyday spoken language. Match the original tone (polite/casual/urgent).
-For Filipino: use standard Tagalog widely understood across the Philippines.`,
-          messages:[{role:'user',content:text}]
-        })
-      });
-    }catch(fetchErr){
-      // fetch自体失敗 = CORS or ネットワーク切断
-        throw new Error('NETWORK');
-    }
-
-    // JSON以外が返ってきた場合（CORSブロック時にHTMLが返ることがある）
-    const ct=res.headers.get('content-type')||'';
-    if(!ct.includes('application/json')){
-        throw new Error('NETWORK');
-    }
-
-    if(!res.ok){
-      const errBody=await res.json().catch(()=>({}));
-      if(res.status===401) throw new Error('AUTH');
-      if(res.status===429) throw new Error('RATE');
-      throw new Error(errBody.error?.message||'HTTP '+res.status);
-    }
-
-    const data=await res.json();
-    const t=data.content?.[0]?.text?.trim();
-    if(!t) throw new Error('EMPTY');
-    showResult(t);
-    autoSpeak(t);
-
-  }catch(e){
-    setStep('idle');
-    if(e.message==='AUTH'){
-      setStatus('⚠️ APIキーが無効です。右上🔑から再設定してください','err');
-      showSetup();
-    } else if(e.message==='RATE'){
-      setStatus('⚠️ リクエスト制限中。数秒待ってから再試行してください','err');
-    } else if(e.message==='NETWORK'){
-      setStatus('⚠️ ネットワークエラー。通信状況を確認してください','err');
-    } else if(e.message==='EMPTY'){
-      setStatus('⚠️ 翻訳結果が空でした。もう一度試してください','err');
-    } else {
-      setStatus('❌ エラー: '+e.message,'err');
-    }
-  }
-}
-
-// ════════════════════════
-// SPEAK
-// ════════════════════════
-function autoSpeak(text){
-  setStep('speak');
-  const lang=dir==='ja'?'tl-PH':'ja-JP';
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang; u.rate=0.88;
-  // ★ Fix: iOSのspeechSynthesis bug対策 → 少し遅延して発話
-  setTimeout(()=>speechSynthesis.speak(u), isIOS?300:0);
-  u.onend  =()=>{ setStep('idle'); setStatus('✅ 完了！もう一度話すには入力エリアをタップ','ok'); setTimeout(()=>setStatus(''),4000); };
-  u.onerror=()=>{ setStep('idle'); setStatus('翻訳完了（読み上げ音声が端末にない場合があります）','err'); };
-}
-function speakAgain(){ if(translated) autoSpeak(translated); }
-
-// ════════════════════════
-// SHOW RESULT
-// ════════════════════════
-function showResult(t){
-  translated=t;
-  const el=document.getElementById('out-text');
-  el.textContent=t; el.className='ocard-body';
-  document.getElementById('out-acts').className='ocard-acts show';
-  document.getElementById('bubble').textContent=t;
-  document.getElementById('bubble').className='bubble'+(dir==='fil'?' ja':'');
-  document.getElementById('bcap').textContent=
-    dir==='ja'?'↑ フィリピン語を相手に見せてください':'↑ 日本語を相手に見せてください';
-  document.getElementById('bwrap').className='bwrap show';
-}
-
-// ════════════════════════
-// STEP INDICATOR
-// ════════════════════════
-function setStep(s){
-  phase=s;
-  const s1=document.getElementById('s1');
-  const s2=document.getElementById('s2');
-  const s3=document.getElementById('s3');
-  // ★ Fix: クラスをリセットしてから付与（t/sクラスを毎回正しく設定）
-  s1.className='st';
-  s2.className='st';
-  s3.className='st';
-  const btn=document.getElementById('tr-btn');
-  const ico=document.getElementById('tr-icon');
-  const txt=document.getElementById('tr-txt');
-  if(s==='listen'){
-    s1.classList.add('on');
-    btn.classList.add('loading');
-  } else if(s==='translate'){
-    s1.classList.add('done'); s2.classList.add('on');
-    btn.classList.add('loading'); ico.textContent='⏳'; txt.textContent='翻訳中…';
-  } else if(s==='speak'){
-    s1.classList.add('done'); s2.classList.add('done'); s3.classList.add('on');
-    btn.classList.remove('loading'); ico.textContent='🔊'; txt.textContent='読み上げ中…';
-  } else {
-    btn.classList.remove('loading');
-    ico.textContent='🔄';
-    txt.textContent=dir==='ja'?'翻訳する':'Isalin';
-  }
-}
-
-// ════════════════════════
-// UTILS
-// ════════════════════════
-function copyOut(){
-  if(!translated)return;
-  navigator.clipboard.writeText(translated)
-    .then(()=>{ setStatus('📋 コピーしました！','ok'); setTimeout(()=>setStatus(''),2000); })
-    .catch(()=>setStatus('コピーできませんでした','err'));
-}
-function clearAll(){
-  clearVin();
-  document.getElementById('out-text').textContent='翻訳がここに表示されます';
-  document.getElementById('out-text').className='ocard-body ph';
-  document.getElementById('out-acts').className='ocard-acts';
-  document.getElementById('bwrap').className='bwrap';
-  translated=''; setStatus(''); setStep('idle');
-  speechSynthesis.cancel();
-}
-function setStatus(msg,type=''){
-  const el=document.getElementById('sb');
-  el.textContent=msg;
-  el.className='sb'+(type?' '+type:'');
-}
-</script>
-
 </body>
 </html>
