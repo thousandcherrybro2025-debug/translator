@@ -238,6 +238,34 @@ textarea.vin.fil:focus{border-color:var(--fil);}
   <div class="ocard-acts" id="out-acts">
     <button class="abt sp" onclick="speakAgain()">🔊 読み上げ</button>
     <button class="abt" onclick="copyOut()">📋 コピー</button>
+    <button class="abt" onclick="toggleVoicePicker()" style="margin-left:auto">🎙️ 音声</button>
+  </div>
+  <div id="voice-picker" style="display:none;padding:8px 14px 14px;border-top:1px solid #ddd8d0;">
+    <div style="font-size:11px;font-weight:700;color:#999;margin-bottom:6px;">読み上げ音声を選択</div>
+    <select id="voice-select" onchange="onVoiceChange()"
+      style="width:100%;padding:8px 10px;border-radius:10px;border:1.5px solid #ddd8d0;
+             font-size:13px;font-family:inherit;background:#fafafa;color:#1a1a2e;">
+      <option value="">自動選択（推奨）</option>
+    </select>
+    <div style="display:flex;gap:12px;margin-top:10px;align-items:flex-start;">
+      <div style="flex:1">
+        <div style="font-size:11px;color:#999;margin-bottom:3px;">速さ: <span id="rate-val">0.82</span></div>
+        <input type="range" id="rate-slider" min="0.5" max="1.5" step="0.05" value="0.82"
+          oninput="document.getElementById('rate-val').textContent=parseFloat(this.value).toFixed(2)"
+          style="width:100%">
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:#999;margin-bottom:3px;">ピッチ: <span id="pitch-val">1.05</span></div>
+        <input type="range" id="pitch-slider" min="0.5" max="2.0" step="0.05" value="1.05"
+          oninput="document.getElementById('pitch-val').textContent=parseFloat(this.value).toFixed(2)"
+          style="width:100%">
+      </div>
+    </div>
+    <button onclick="speakAgain()"
+      style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:none;
+             background:#e74c3c;color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">
+      ▶ テスト再生
+    </button>
   </div>
 </div>
 
@@ -394,17 +422,90 @@ async function doTranslate() {
 }
 
 // ════════════════════════
-// SPEAK
+// SPEAK - 高品質音声選択
 // ════════════════════════
+
+// 優先音声リスト（品質順）
+const VOICE_PRIORITY = {
+  'tl-PH': [
+    'Google Filipino','Google Tagalog','Microsoft Blessica','Microsoft Maria',
+    'Blessica','Filipino','Tagalog','tl-PH','tl'
+  ],
+  'ja-JP': [
+    'Google 日本語','Microsoft Haruka','Microsoft Nanami','Kyoko','Otoya',
+    'O-ren','ja-JP','ja'
+  ]
+};
+
+function getBestVoice(lang) {
+  const voices = speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const priorities = VOICE_PRIORITY[lang] || [];
+
+  // 優先リスト順に完全一致を探す
+  for (const p of priorities) {
+    const v = voices.find(v =>
+      v.name === p ||
+      v.name.toLowerCase().includes(p.toLowerCase()) ||
+      v.lang === p ||
+      v.lang.startsWith(p)
+    );
+    if (v) return v;
+  }
+  // フォールバック：言語コードで前方一致
+  const langShort = lang.split('-')[0];
+  return voices.find(v => v.lang === lang)
+      || voices.find(v => v.lang.startsWith(langShort))
+      || null;
+}
+
 function autoSpeak(text) {
   setStep('speak');
-  const lang = dir==='ja'?'tl-PH':'ja-JP';
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang=lang; u.rate=0.88;
-  setTimeout(()=>speechSynthesis.speak(u), isIOS?250:0);
-  u.onend  = ()=>{ setStep('idle'); setStatus('✅ 完了！','ok'); setTimeout(()=>setStatus(''),3000); };
-  u.onerror= ()=>{ setStep('idle'); };
+
+  const lang = dir==='ja' ? 'tl-PH' : 'ja-JP';
+
+  const speak = () => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+
+    // 手動選択 or 自動選択で最高品質の音声を使用
+    const voice = selectedVoice || getBestVoice(lang);
+    if (voice) {
+      u.voice = voice;
+    }
+
+    // 言語別に最適なパラメータ設定
+    // スライダー値を優先、なければデフォルト
+    const rateEl  = document.getElementById('rate-slider');
+    const pitchEl = document.getElementById('pitch-slider');
+    u.rate   = rateEl  ? parseFloat(rateEl.value)  : (lang==='tl-PH' ? 0.82 : 0.85);
+    u.pitch  = pitchEl ? parseFloat(pitchEl.value) : (lang==='tl-PH' ? 1.05 : 1.00);
+    u.volume = 1.0;
+
+    u.onend   = () => { setStep('idle'); setStatus('✅ 完了！','ok'); setTimeout(()=>setStatus(''),3000); };
+    u.onerror = (e) => {
+      setStep('idle');
+      if (e.error !== 'interrupted') setStatus('読み上げ音声が見つかりません','err');
+    };
+    speechSynthesis.speak(u);
+  };
+
+  // 音声リストの読み込みを待つ（iOSは遅延が必要）
+  const voices = speechSynthesis.getVoices();
+  if (voices.length) {
+    setTimeout(speak, isIOS ? 300 : 0);
+  } else {
+    // 音声リスト未読込の場合はイベントを待つ
+    speechSynthesis.onvoiceschanged = () => {
+      speechSynthesis.onvoiceschanged = null;
+      setTimeout(speak, isIOS ? 300 : 0);
+    };
+    // タイムアウト保険（3秒後に強制実行）
+    setTimeout(() => {
+      if (phase === 'speak') speak();
+    }, 3000);
+  }
 }
 function speakAgain() { if(translated) autoSpeak(translated); }
 
@@ -503,6 +604,71 @@ function setStep(s) {
   else{btn.classList.remove('loading');ico.textContent='🔄';
     txt.textContent=dir==='ja'?'翻訳':'Isalin';}
 }
+// ════════════════════════
+// VOICE PICKER
+// ════════════════════════
+let selectedVoice = null;
+
+function populateVoiceList() {
+  const voices = speechSynthesis.getVoices();
+  const lang = dir==='ja' ? 'tl-PH' : 'ja-JP';
+  const langShort = lang.split('-')[0];
+  const sel = document.getElementById('voice-select');
+  if (!sel) return;
+
+  // 現在の言語に対応する音声だけ表示
+  const relevant = voices.filter(v =>
+    v.lang === lang || v.lang.startsWith(langShort) ||
+    v.name.toLowerCase().includes(langShort)
+  );
+
+  sel.innerHTML = '<option value="">自動選択（推奨）</option>';
+  relevant.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = v.name + ' (' + v.lang + ')' + (v.localService ? ' 🔵' : ' 🌐');
+    opt.dataset.voiceName = v.name;
+    sel.appendChild(opt);
+  });
+
+  // 自動選択された音声を表示
+  const best = getBestVoice(lang);
+  if (best) {
+    const bestOpt = Array.from(sel.options).find(o => o.dataset.voiceName === best.name);
+    if (bestOpt) bestOpt.textContent = '✓ ' + bestOpt.textContent + ' ← 自動選択中';
+  }
+
+  if (relevant.length === 0) {
+    sel.innerHTML = '<option value="">この言語の音声が見つかりません</option>';
+  }
+}
+
+function toggleVoicePicker() {
+  const picker = document.getElementById('voice-picker');
+  const isHidden = picker.style.display === 'none';
+  picker.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    populateVoiceList();
+    // スライダーの値を現在の言語に合わせる
+    const isTl = dir === 'ja';
+    document.getElementById('rate-slider').value = isTl ? '0.82' : '0.85';
+    document.getElementById('rate-val').textContent = isTl ? '0.82' : '0.85';
+    document.getElementById('pitch-slider').value = isTl ? '1.05' : '1.00';
+    document.getElementById('pitch-val').textContent = isTl ? '1.05' : '1.00';
+  }
+}
+
+function onVoiceChange() {
+  const sel = document.getElementById('voice-select');
+  const name = sel.options[sel.selectedIndex]?.dataset.voiceName;
+  if (name) {
+    const voices = speechSynthesis.getVoices();
+    selectedVoice = voices.find(v => v.name === name) || null;
+  } else {
+    selectedVoice = null;
+  }
+}
+
 function copyOut(){
   if(!translated)return;
   navigator.clipboard.writeText(translated)
