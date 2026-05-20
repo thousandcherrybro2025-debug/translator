@@ -504,8 +504,8 @@ async function doTranslate() {
 // 優先音声リスト（品質順）
 const VOICE_PRIORITY = {
   'tl-PH': [
-    'Google Filipino','Google Tagalog','Microsoft Blessica','Microsoft Maria',
-    'Blessica','Filipino','Tagalog','tl-PH','tl'
+    'Google Filipino','Google Tagalog','Microsoft Blessica','Blessica',
+    'Filipino','Tagalog','tl-PH','tl'
   ],
   'ja-JP': [
     'Google 日本語','Microsoft Haruka','Microsoft Nanami','Kyoko','Otoya',
@@ -513,26 +513,52 @@ const VOICE_PRIORITY = {
   ]
 };
 
+// タガログ語がない場合のフォールバック音声（英語読みでも伝わる）
+const TL_FALLBACK = [
+  'Google US English','Samantha','Karen','Moira',  // 英語系
+  'Google español','Paulina',                        // スペイン語系（タガログ語に近い音）
+];
+
 function getBestVoice(lang) {
   const voices = speechSynthesis.getVoices();
   if (!voices.length) return null;
   const priorities = VOICE_PRIORITY[lang] || [];
 
-  // 優先リスト順に完全一致を探す
+  // 1. 優先リストから探す
   for (const p of priorities) {
     const v = voices.find(v =>
       v.name === p ||
       v.name.toLowerCase().includes(p.toLowerCase()) ||
-      v.lang === p ||
-      v.lang.startsWith(p)
+      v.lang === p || v.lang.startsWith(p)
     );
     if (v) return v;
   }
-  // フォールバック：言語コードで前方一致
+
+  // 2. タガログ語音声がない場合
+  if (lang === 'tl-PH') {
+    // スペイン語系（タガログ語と音が近い）を優先
+    const esVoice = voices.find(v => v.lang.startsWith('es'));
+    if (esVoice) return esVoice;
+    // 英語系フォールバック
+    for (const p of TL_FALLBACK) {
+      const v = voices.find(v => v.name.includes(p) || v.name === p);
+      if (v) return v;
+    }
+    // 何でもいいので英語音声
+    return voices.find(v => v.lang.startsWith('en')) || voices[0];
+  }
+
   const langShort = lang.split('-')[0];
   return voices.find(v => v.lang === lang)
       || voices.find(v => v.lang.startsWith(langShort))
       || null;
+}
+
+// タガログ語音声が端末にあるか確認
+function hasTlVoice() {
+  const voices = speechSynthesis.getVoices();
+  return voices.some(v => v.lang === 'tl-PH' || v.lang.startsWith('tl') ||
+    v.name.toLowerCase().includes('filipino') || v.name.toLowerCase().includes('tagalog'));
 }
 
 function autoSpeak(text) {
@@ -808,6 +834,13 @@ function bigSpeak() {
     document.getElementById('speak-wave').style.display = 'flex';
     isSpeaking = true;
 
+    // タガログ語音声がない場合の案内
+    if (lang === 'tl-PH' && !hasTlVoice()) {
+      const nameEl = document.getElementById('voice-name-display');
+      if (nameEl) nameEl.textContent = '⚠️ タガログ語音声なし→代替音声使用中';
+      showTlVoiceGuide();
+    }
+
     u.onend = u.onerror = () => {
       isSpeaking = false;
       btn.classList.remove('speaking');
@@ -857,7 +890,17 @@ function populateVoiceList2() {
   const nameEl = document.getElementById('voice-name-display');
   if (nameEl) nameEl.textContent = best ? best.name : '不明';
 
-  if (relevant.length === 0) {
+  if (relevant.length === 0 && lang === 'tl-PH') {
+    sel.innerHTML = `
+      <option value="">⚠️ タガログ語音声なし（代替音声で読み上げ）</option>
+      ${voices.filter(v=>v.lang.startsWith('es')).map((v,i)=>
+        `<option value="es_${i}" data-voice-name="${v.name}">🇵🇭代替: ${v.name} (スペイン語系)</option>`
+      ).join('')}
+      ${voices.filter(v=>v.lang.startsWith('en')).slice(0,3).map((v,i)=>
+        `<option value="en_${i}" data-voice-name="${v.name}">🔤代替: ${v.name} (英語)</option>`
+      ).join('')}
+    `;
+  } else if (relevant.length === 0) {
     sel.innerHTML = '<option value="">この言語の音声が見つかりません</option>';
   }
 }
@@ -874,6 +917,37 @@ function onVoiceChange2() {
   // 選択した音声名を表示
   const nameEl = document.getElementById('voice-name-display');
   if (nameEl) nameEl.textContent = selectedVoice2 ? selectedVoice2.name : '自動選択中...';
+}
+
+function showTlVoiceGuide() {
+  // 既に表示済みなら何もしない
+  if (document.getElementById('tl-guide')) return;
+  const sz = document.getElementById('speak-zone');
+  const guide = document.createElement('div');
+  guide.id = 'tl-guide';
+  guide.style.cssText = `
+    background:#fff8e1;border:1.5px solid #ffe082;border-radius:12px;
+    padding:12px 14px;margin-top:8px;font-size:12px;color:#7a6000;line-height:1.7;
+  `;
+  guide.innerHTML = `
+    <b>📱 タガログ語音声のインストール方法</b><br>
+    iPhoneの設定アプリ → <b>一般</b> → <b>VoiceOver</b><br>
+    または 設定 → <b>アクセシビリティ</b> → <b>読み上げコンテンツ</b> → <b>声</b> →
+    <b>声を追加</b> → <b>フィリピン語</b><br><br>
+    <b>今すぐ代替手段：</b><br>
+    <a href="https://translate.google.com/?sl=ja&tl=tl&text=${encodeURIComponent(translated)}&op=translate"
+      target="_blank"
+      style="display:inline-block;background:#4285f4;color:#fff;padding:8px 16px;
+             border-radius:8px;text-decoration:none;font-weight:700;margin-top:4px;">
+      🌐 Google翻訳アプリで聞く
+    </a>
+    <button onclick="document.getElementById('tl-guide').remove()"
+      style="display:block;margin-top:8px;background:none;border:none;
+             color:#7a6000;font-size:11px;cursor:pointer;font-family:inherit;">
+      ✕ 閉じる
+    </button>
+  `;
+  sz.appendChild(guide);
 }
 
 function toggleSpeakSettings() {
